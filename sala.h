@@ -1,5 +1,7 @@
 #ifndef SALA_H
 #define SALA_H
+//Comprueba que la sala este creada devuelve 0 si no esta creada, 1 si esta creada
+int comprobar_sala();
 //Reserva asiento retorna el id del asiento o un -1 si hay algun error
 int reserva_asiento(int id_persona);
 //Libera asiento retorna el id de la persona o un -1 si hay algun error o estaba libre
