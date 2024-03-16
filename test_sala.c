@@ -6,6 +6,16 @@
 #define DebeSerCierto(x)	assert(x)
 #define DebeSerFalso(x)		assert(!(x))
 
+#define CAPACIDAD_CUYAS 943
+#define CAPACIDAD_ALFREDO_KRAUS 1570
+#define CAPACIDAD_PARANINFO 600
+#define CAPACIDAD_PEREZ_GALDOS 1007
+
+#define ID_1 1500
+#define ID_2 4321
+#define ID_3 7777
+#define ID_4 2
+
 void INICIO_TEST (const char* titulo_test)
 {
   printf("********** batería de pruebas para %s: ", titulo_test); 
@@ -19,13 +29,9 @@ void FIN_TEST (const char* titulo_test)
   printf ("********** hecho\n");
 }
 
-
 void test_ReservaBasica()
 {
 	int mi_asiento;
-	#define CAPACIDAD_CUYAS 500
-	#define ID_1 1500
-
 	INICIO_TEST("Reserva básica");
 	crea_sala(CAPACIDAD_CUYAS);
 	DebeSerCierto(capacidad_sala()==CAPACIDAD_CUYAS);
@@ -38,11 +44,24 @@ void test_ReservaBasica()
 	FIN_TEST("Reserva básica");
 }
 
+void test_IntegridadSalaCreada()
+{
+	DebeSerCierto(reserva_asiento(ID_4) == -1);
+	DebeSerCierto(libera_asiento(33) == -1);
+	DebeSerCierto(estado_asiento(5)== -1);
+	DebeSerCierto(asientos_libres() == 0);
+	DebeSerCierto(asientos_ocupados() == 0);
+	DebeSerCierto(capacidad_sala() == 0);
+	DebeSerCierto(elimina_sala() == -1);
+	DebeSerFalso(crea_sala(CAPACIDAD_PARANINFO) == -1);
+	elimina_sala();
 
+}
 void ejecuta_tests ()
 {
+	test_IntegridadSalaCreada();
 	test_ReservaBasica();
-	// Añadir nuevos tests 
+	test_IntegridadSalaCreada();
 }
 
 
