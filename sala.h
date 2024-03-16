@@ -13,7 +13,7 @@ int asientos_ocupados();
 //Devuelve la capacidad maxima de la sala
 int capacidad_sala();
 //Crea la sala devuelve la capacidad de la sala o un -1 si hay algun error
-int crear_sala(int capacidad);
+int crea_sala(int capacidad);
 //Elimina la sala devuelve 0 si todo a ido bien o un -1 si hay algun error
 int elimina_sala();
 #endif

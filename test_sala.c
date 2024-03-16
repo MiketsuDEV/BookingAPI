@@ -28,7 +28,7 @@ void test_ReservaBasica()
 
 	INICIO_TEST("Reserva básica");
 	crea_sala(CAPACIDAD_CUYAS);
-	DebeSerCierto(capacidad()==CAPACIDAD_CUYAS);
+	DebeSerCierto(capacidad_sala()==CAPACIDAD_CUYAS);
 	DebeSerCierto((mi_asiento=reserva_asiento(ID_1))>=0);
 	DebeSerCierto((asientos_libres()+asientos_ocupados())==CAPACIDAD_CUYAS);
 	DebeSerCierto(estado_asiento(mi_asiento)>0);

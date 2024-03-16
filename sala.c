@@ -27,14 +27,14 @@ int reserva_asiento(int id_persona)
 int libera_asiento (int id_asiento)
 {
   if(!sala_creada) return -1;//comprobamos si hay una sala ya creada
-  if (id_asiento > capacidad_sala || id_asiento <= 0){return -1;}//comprobamos id_asiento es valido
+  if (id_asiento > num_asientos || id_asiento <= 0){return -1;}//comprobamos id_asiento es valido
   return *(ptr_ini_sala + id_asiento - 1); //devolvemos el id_persona
 }
 
 int estado_asiento (int id_asiento)
 {
   if(!sala_creada) return -1;//comprobamos si hay una sala ya creada
-  if (id_asiento > capacidad_sala || id_asiento <= 0){return -1;}//comprobamos id_asiento es valido
+  if (id_asiento > num_asientos || id_asiento <= 0){return -1;}//comprobamos id_asiento es valido
   return *(ptr_ini_sala + id_asiento - 1) == -1 ? 0 : *(ptr_ini_sala + id_asiento - 1);//devolvemos el id_persona o un 0 si esta vacio 
 }
 
@@ -44,7 +44,7 @@ int asientos_ocupados(){return num_asientos_ocupados;}
 
 int capacidad_sala(){return num_asientos;}
 
-int crear_sala (int capacidad)
+int crea_sala (int capacidad)
 {
   if(sala_creada) return -1; //comprobamos si hay una sala ya creada
   if(capacidad>CAPACIDAD_MAXIMA || capacidad <= 0)return -1;//comprobamos que la capacidad esta dentro del rango permitido
@@ -62,7 +62,7 @@ int crear_sala (int capacidad)
   num_asientos_ocupados = 0;//reset variables
   return num_asientos = capacidad; //devuelve la capacidad de la sala creada 
 }
-int eliminar_sala()
+int elimina_sala()
 {
   if(!sala_creada) return -1;//comprobamos si hay una sala ya creada
   free(ptr_ini_sala);//liberamos memoria
