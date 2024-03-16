@@ -1,10 +1,7 @@
-// test_sala.c
-// ===============
-// Batería de pruebas de la biblioteca "sala.h/sala.c"
-//
-
 #include <assert.h>
 #include <stdio.h>
+#include "sala.h"
+#include "test_sala.h"
 
 #define DebeSerCierto(x)	assert(x)
 #define DebeSerFalso(x)		assert(!(x))
@@ -48,11 +45,4 @@ void ejecuta_tests ()
 	// Añadir nuevos tests 
 }
 
-main()
-{
-	puts("Iniciando tests...");
-	
-	ejecuta_tests();
-	
-	puts("Batería de test completa.");
-}
+
