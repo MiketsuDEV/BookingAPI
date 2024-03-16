@@ -46,15 +46,26 @@ void test_ReservaBasica()
 
 void test_IntegridadSalaCreada()
 {
+	INICIO_TEST("Integridad Sala Creada");
 	DebeSerCierto(reserva_asiento(ID_4) == -1);
-	DebeSerCierto(libera_asiento(33) == -1);
+	DebeSerCierto(libera_asiento(1) == -1);
 	DebeSerCierto(estado_asiento(5)== -1);
 	DebeSerCierto(asientos_libres() == 0);
 	DebeSerCierto(asientos_ocupados() == 0);
 	DebeSerCierto(capacidad_sala() == 0);
 	DebeSerCierto(elimina_sala() == -1);
-	DebeSerFalso(crea_sala(CAPACIDAD_PARANINFO) == -1);
-	elimina_sala();
+	DebeSerCierto(crea_sala(CAPACIDAD_PARANINFO) == CAPACIDAD_PARANINFO);
+	DebeSerCierto(crea_sala(CAPACIDAD_PARANINFO) == -1);
+
+	DebeSerFalso(reserva_asiento(ID_4) == -1);
+	DebeSerFalso(reserva_asiento(ID_2) == -1);
+	DebeSerFalso(libera_asiento(1) == -1);
+	DebeSerFalso(estado_asiento(5)== -1);
+	DebeSerFalso(asientos_libres() == 0);
+	DebeSerFalso(asientos_ocupados() == 0);
+	DebeSerFalso(capacidad_sala() == 0);
+	DebeSerFalso(elimina_sala() == -1);
+	FIN_TEST("Integridad Sala Creada");
 
 }
 void ejecuta_tests ()

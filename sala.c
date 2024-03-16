@@ -19,7 +19,7 @@ int reserva_asiento(int id_persona)
   if(id_persona <= 0){return -1;}//comprobamos que el id_persona es valido
   for(ptr=ptr_ini_sala;ptr<=ptr_fin_sala;ptr++)
   { 
-    if(*ptr == -1){*ptr = id_persona; return ptr - ptr_ini_sala + 1;} //recorremos los asientos hasta encontrar uno vacio y lo reservamos
+    if(*ptr == -1){*ptr = id_persona; num_asientos_ocupados++; return ptr - ptr_ini_sala + 1;} //recorremos los asientos hasta encontrar uno vacio y lo reservamos
   }
   return -1;//devolvemos -1 si esta la sala llena
 }
