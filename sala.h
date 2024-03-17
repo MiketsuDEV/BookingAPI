@@ -2,7 +2,7 @@
 #define SALA_H
 //Reserva asiento retorna el id del asiento o un -1 si hay algun error
 int reserva_asiento(int id_persona);
-//Libera asiento retorna el id de la persona o un -1 si hay algun error o estaba libre
+//Libera asiento retorna el id de la persona o un -1 si hay algun error o un 0 si estaba libre
 int libera_asiento(int id_asiento);
 //Estado asiento retorna el id de la persona, 0 si esta libre o un -1 si hay algun error
 int estado_asiento(int id_asiento);

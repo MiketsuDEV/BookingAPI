@@ -72,13 +72,13 @@ void test_reserva_multiple()
 {
 	INICIO_TEST("Reserva Multiple");
 	DebeSerCierto(crea_sala(CAPACIDAD_PEREZ_GALDOS) == CAPACIDAD_PEREZ_GALDOS);
-	sentarse(ID_1);
 	sentarse(-15);
+	sentarse(ID_1);
 	sentarse(ID_4);
 	sentarse(ID_3);
+	levantarse(-130);
 	levantarse(1);
 	levantarse(15);
-	levantarse(-130);
 	levantarse(3);
 	estado_sala();
 	DebeSerCierto(elimina_sala() == 0);
@@ -102,6 +102,7 @@ void estado_sala()
 	printf("\n######################################\n");
 	fflush(stdout);
 }
+
 void sentarse(int id_persona)
 {
 	int id_asiento = reserva_asiento(id_persona);
@@ -116,6 +117,7 @@ void sentarse(int id_persona)
 		break;
 	}
 }
+
 void levantarse(int id_asiento)
 {
 	int id_persona = libera_asiento(id_asiento);
@@ -132,6 +134,7 @@ void levantarse(int id_asiento)
 		break;
 	}
 }
+
 void ejecuta_tests ()
 {
 	test_integridad_sala_creada();

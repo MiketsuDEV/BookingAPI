@@ -29,8 +29,9 @@ int libera_asiento (int id_asiento)
   if(!sala_creada) return -1;//comprobamos si hay una sala ya creada
   ptr = ptr_ini_sala + id_asiento - 1;
   int id_persona = *ptr;
-  if (id_asiento > num_asientos || id_asiento <= 0)return -1;//comprobamos id_asiento es valido
-  if(id_persona != -1){num_asientos_ocupados--; *ptr = -1;}
+  if (id_asiento > num_asientos)return -1;//comprobamos id_asiento es valido
+  if(id_persona == -1)return 0;
+  num_asientos_ocupados--; *ptr = -1;
   return id_persona; 
 }
 
