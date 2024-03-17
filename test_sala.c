@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "sala.h"
 #include "test_sala.h"
 
@@ -15,6 +16,7 @@
 #define ID_2 4321
 #define ID_3 7777
 #define ID_4 2
+
 
 void INICIO_TEST (const char* titulo_test)
 {
@@ -71,15 +73,41 @@ void test_integridad_sala_creada()
 void test_reserva_multiple()
 {
 	INICIO_TEST("Reserva Multiple");
+	int grupo_1 = CAPACIDAD_PEREZ_GALDOS;
+	int* lista_grupo_1 = (int*)malloc(grupo_1 * sizeof(int));
+	for(int i = 0; i<=grupo_1;i++)
+	{
+		lista_grupo_1[i]= rand() % 10000;
+	}
+	int grupo_2 = 50;
+	int* lista_grupo_2 = (int*)malloc(grupo_2 * sizeof(int));
+	for(int i = 0; i<=grupo_2;i++)
+	{
+		lista_grupo_2[i]= rand() % 200;
+	}
+	int liberar_grupo_1 = 500;
+	int* lista_id_asientos_1 = (int*)malloc(liberar_grupo_1 * sizeof(int));
+	for(int i = 0; i<=liberar_grupo_1;i++)
+	{
+		lista_id_asientos_1[i] = rand() % CAPACIDAD_PEREZ_GALDOS;
+	}
+	int liberar_grupo_2 = 20;
+	int* lista_id_asientos_2 = (int*)malloc(liberar_grupo_2 * sizeof(int));
+	for(int i = 0; i<=liberar_grupo_2;i++)
+	{
+		lista_id_asientos_2[i] = rand() % CAPACIDAD_PEREZ_GALDOS;
+	}
 	DebeSerCierto(crea_sala(CAPACIDAD_PEREZ_GALDOS) == CAPACIDAD_PEREZ_GALDOS);
-	sentarse(-15);
-	sentarse(ID_1);
-	sentarse(ID_4);
-	sentarse(ID_3);
-	levantarse(-130);
-	levantarse(1);
-	levantarse(15);
-	levantarse(3);
+	reserva_multiple(grupo_1, lista_grupo_1);
+	reserva_multiple(grupo_2, lista_grupo_2);
+	liberar_multiple(liberar_grupo_2, lista_id_asientos_2);
+	reserva_multiple(grupo_2, lista_grupo_2);
+	liberar_multiple(liberar_grupo_1, lista_id_asientos_1);
+	reserva_multiple(grupo_2, lista_grupo_2);
+	free(lista_grupo_1);
+	free(lista_grupo_2);
+	free(lista_id_asientos_1);
+	free(lista_id_asientos_2);
 	estado_sala();
 	DebeSerCierto(elimina_sala() == 0);
 	FIN_TEST("Reserva Multiple");
@@ -134,7 +162,38 @@ void levantarse(int id_asiento)
 		break;
 	}
 }
+void reserva_multiple(int npersonas, int* lista_id_personas)
+{
+	if(npersonas > asientos_libres())
+	{
+		printf("No se puede hacer la reserva multiple, no hay asientos disponibles.\n");
+		return;
+	}
+	for(int i = 0; i<=npersonas;i++)
+	{
+		reserva_asiento(lista_id_personas[i]);
+	}
+	printf("Se han reservado %d asientos.\n", npersonas);
+	return;
+}
+void liberar_multiple(int nasientos, int* lista_id_asiento)
+{
+	if(nasientos > capacidad_sala())
+	{
+		printf("Los asientos a liberar exceden la capacidad de la sala.\n");
+		return;
+	}
+	for(int i=0; i<=nasientos;i++)
+	{
+		libera_asiento(lista_id_asiento[i]);
+	}
+	printf("Se han liberado %d asientos.\n", nasientos);
+	return;
+}
+void estado_linea_asientos(int linea_asientos)
+{
 
+}
 void ejecuta_tests ()
 {
 	test_integridad_sala_creada();
