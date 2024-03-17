@@ -73,29 +73,34 @@ void test_integridad_sala_creada()
 void test_reserva_multiple()
 {
 	INICIO_TEST("Reserva Multiple");
+	//G1
 	int grupo_1 = CAPACIDAD_PEREZ_GALDOS;
 	int* lista_grupo_1 = (int*)malloc(grupo_1 * sizeof(int));
 	for(int i = 0; i<=grupo_1;i++)
 	{
 		lista_grupo_1[i]= rand() % 10000;
 	}
+	//G2
 	int grupo_2 = 50;
 	int* lista_grupo_2 = (int*)malloc(grupo_2 * sizeof(int));
-	for(int i = 0; i<=grupo_2;i++)
+	for(int i = 0; i<grupo_2;i++)
 	{
 		lista_grupo_2[i]= rand() % 200;
 	}
+	//LG1
 	int liberar_grupo_1 = 500;
 	int* lista_id_asientos_1 = (int*)malloc(liberar_grupo_1 * sizeof(int));
-	for(int i = 0; i<=liberar_grupo_1;i++)
+	for(int i = 0; i<liberar_grupo_1;i++)
 	{
-		lista_id_asientos_1[i] = rand() % CAPACIDAD_PEREZ_GALDOS;
+		lista_id_asientos_1[i] = rand() % (CAPACIDAD_PEREZ_GALDOS-1)+1;
 	}
+	//LG2
 	int liberar_grupo_2 = 20;
 	int* lista_id_asientos_2 = (int*)malloc(liberar_grupo_2 * sizeof(int));
-	for(int i = 0; i<=liberar_grupo_2;i++)
+	for(int i = 0; i<liberar_grupo_2;i++)
 	{
-		lista_id_asientos_2[i] = rand() % CAPACIDAD_PEREZ_GALDOS;
+		
+		lista_id_asientos_2[i] = rand() % (CAPACIDAD_PEREZ_GALDOS-1)+1;
 	}
 	DebeSerCierto(crea_sala(CAPACIDAD_PEREZ_GALDOS) == CAPACIDAD_PEREZ_GALDOS);
 	reserva_multiple(grupo_1, lista_grupo_1);
@@ -183,16 +188,12 @@ void liberar_multiple(int nasientos, int* lista_id_asiento)
 		printf("Los asientos a liberar exceden la capacidad de la sala.\n");
 		return;
 	}
-	for(int i=0; i<=nasientos;i++)
+	for(int i=0; i<nasientos;i++)
 	{
 		libera_asiento(lista_id_asiento[i]);
 	}
 	printf("Se han liberado %d asientos.\n", nasientos);
 	return;
-}
-void estado_linea_asientos(int linea_asientos)
-{
-
 }
 void ejecuta_tests ()
 {

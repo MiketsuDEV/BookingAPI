@@ -6,9 +6,7 @@
 int main()
 {
 	puts("Iniciando tests...");
-	
 	ejecuta_tests();
-	
 	puts("Batería de test completa.");
     exit(0);
 }
