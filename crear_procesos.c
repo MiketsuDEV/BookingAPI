@@ -18,14 +18,8 @@ void crear_sucursal(const char *ciudad,int capacidad){	// aqui hacemos la llamad
 		perror("error llamando al fork");
 		exit(1);
 	}
-	
-	
 }
 
-main(){
-	crear_sucursal("las palmas", 100);
-	exit(0);
-}
 
 
 

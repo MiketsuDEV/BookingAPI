@@ -7,6 +7,7 @@
 
 int main()
 {
+	crear_sucursal("Las palmas", 100);
 	leer_shell();
     exit(0);
 }
