@@ -4,7 +4,7 @@
 #include <sys/wait.h>
 #include <stdlib.h>
 
-
+/*
 void crear_sucursal(const *char ciudad, capacidad){
 // aqui hacemos la llamada a minishell con creacion de procesos con fork y exec
 	int pid_t = fork();
@@ -24,9 +24,7 @@ void crear_sucursal(const *char ciudad, capacidad){
 	
 }
 
+*/
 
 
 
-main(){
-
-}
