@@ -8,10 +8,11 @@
 
 void crear_sucursal(const char *ciudad,int capacidad){	// aqui hacemos la llamada a minishell con creacion de procesos con fork y exec
 	int pid_t = fork();
-	if (pid_t == 0){	// proceso hijo		
-		execlp("gnome-terminal","gnome-terminal",NULL);
-		perror("execvp");
-		exit(1);
+	if (pid_t == 0){	// proceso hijo
+		char *tira[] = {"gnome-terminal","-e","./a",NULL};		
+		execvp("gnome-terminal",tira);
+		
+		
 	}else if(pid_t >1){
 		wait(NULL);
 	}else{
