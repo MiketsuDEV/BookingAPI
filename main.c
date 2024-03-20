@@ -7,8 +7,6 @@
 
 int main()
 {
-	puts("Iniciando tests...");
-	ejecuta_tests();
-	puts("Batería de test completa.");
+	leer_shell();
     exit(0);
 }
