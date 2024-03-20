@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "shell_interactivo.h"
+#include "crear_procesos.h"
 
 #define bool int
 #define false 0
@@ -33,7 +34,7 @@ int procesar_input(char* input)
         int capacidad_sala = atoi(strtok(NULL, " "));
         printf("DEBUG Nombre de la sala: %s\n", nombre_sala);
         printf("DEBUG Capacidad de la sala: %d\n", capacidad_sala);
-        //crear_sucursal(nombre_sala, capacidad_sala);
+        crear_sucursal(nombre_sala, capacidad_sala);
         return false;
     }
     return false;
