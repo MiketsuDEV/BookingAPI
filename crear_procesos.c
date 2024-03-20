@@ -2,12 +2,25 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include <string.h>
+#include <stdlib.h>
 
-void crear_sucursal(const *char ciudad, capacidad);
+
 void crear_sucursal(const *char ciudad, capacidad){
 // aqui hacemos la llamada a minishell con creacion de procesos con fork y exec
 	int pid_t = fork();
+	if (pid == 0){	// proceso hijo
+		char *arg[] ={"gnome-terminal","-e","./sala.c",NULL,ciudad,capacidad};
+		//sala.c es provisional ya que creo que tengo que llamar al shell que hace miguel
+		execvp("gnome-terminal",args);
+		perror("execvp");
+		exit(1);
+	}else if(pid >1){
+		wait(NULL);
+	}else{
+		perror("error llamando al fork");
+		exit(1);
+	}
+	
 	
 }
 
@@ -15,22 +28,5 @@ void crear_sucursal(const *char ciudad, capacidad){
 
 
 main(){
-	int capacidad;
-	char nombresala[20];
-
-	while(1){
-		// pedimos nombre y cantidad de la sala
-		printf("Dime cual quieres que sea el tamaño de la sala");
-		scanf("%d",capacidad);
-		printf("dime el nombre que quieres ponerle a la sala");
-		scanf("%s",nombresala);
-
-
-		if(!strcmp("salir",nombresala))break;	// aqui lo que hace es que si salir es el nombre de 
-							// la sala pues acaba el programa y sale del shell
-
-		void crear_sucursal(nombresala,capacidad);
-	}// aqui acaba el programa
-
 
 }
