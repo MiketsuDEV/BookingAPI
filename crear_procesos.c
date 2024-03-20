@@ -4,17 +4,15 @@
 #include <sys/wait.h>
 #include <stdlib.h>
 
-/*
-void crear_sucursal(const *char ciudad, capacidad){
-// aqui hacemos la llamada a minishell con creacion de procesos con fork y exec
+
+
+void crear_sucursal(const char *ciudad,int capacidad){	// aqui hacemos la llamada a minishell con creacion de procesos con fork y exec
 	int pid_t = fork();
-	if (pid == 0){	// proceso hijo
-		char *arg[] ={"gnome-terminal","-e","./sala.c",NULL,ciudad,capacidad};
-		//sala.c es provisional ya que creo que tengo que llamar al shell que hace miguel
-		execvp("gnome-terminal",args);
+	if (pid_t == 0){	// proceso hijo		
+		execlp("gnome-terminal","gnome-terminal",NULL);
 		perror("execvp");
 		exit(1);
-	}else if(pid >1){
+	}else if(pid_t >1){
 		wait(NULL);
 	}else{
 		perror("error llamando al fork");
@@ -24,7 +22,11 @@ void crear_sucursal(const *char ciudad, capacidad){
 	
 }
 
-*/
+main(){
+	crear_sucursal("las palmas", 100);
+	exit(0);
+}
+
 
 
 
