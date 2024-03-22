@@ -5,5 +5,7 @@ int procesar_input(char* input);
 int procesar_crear_sala();
 int procesar_reservar_asiento();
 int procesar_liberar_asiento();
+int procesar_estado_asiento();
 int procesar_estado_sala();
+int procesar_cerrar_sala();
 #endif

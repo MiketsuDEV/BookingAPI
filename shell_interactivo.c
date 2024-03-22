@@ -42,9 +42,17 @@ int procesar_input(char* input)
     {
         procesar_liberar_asiento();
         return false;
+    }else if(!strcmp(comando, "estado_asiento"))
+    {
+        procesar_estado_asiento();
+        return false;
     }else if(!strcmp(comando, "estado_sala"))
     {
         procesar_estado_sala();
+        return false;
+    }else if(!strcmp(comando, "cerrar_sala"))
+    {
+        cerrar_sala();
         return false;
     }
     return false;
@@ -74,6 +82,12 @@ int procesar_liberar_asiento()
 	}
     return 1;
 }
+int procesar_estado_asiento()
+{
+    int id_asiento = atoi(strtok(NULL, " "));
+    estado_asiento(id_asiento);
+    return 0;
+}
 int procesar_estado_sala()
 {
 	printf("\n######################################\n");
@@ -91,4 +105,10 @@ int procesar_estado_sala()
 	}
 	printf("\n######################################\n");
 	fflush(stdout);
+    return 0;
+}
+int procesar_cerrar_sala()
+{
+    elimina_sala();
+    return 0;
 }
