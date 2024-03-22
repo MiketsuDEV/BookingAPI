@@ -52,7 +52,7 @@ int procesar_input(char* input)
         return false;
     }else if(!strcmp(comando, "cerrar_sala"))
     {
-        cerrar_sala();
+        //cerrar_sala();
         return false;
     }
     return false;

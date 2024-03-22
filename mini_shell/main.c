@@ -11,3 +11,9 @@ int main()
 	leer_shell();
     exit(0);
 }
+int main(int argc, char *argv[])
+{
+	//crear_sucursal(argv[0], argv[1]);
+	printf("%d,%d,", argv[0], argv[1]);
+    exit(0);
+}
