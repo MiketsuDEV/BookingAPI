@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "shell_interactivo.h"
-#include "crear_procesos.h"
 #include "sala.h"
 
 #define bool int
