@@ -8,4 +8,5 @@ int procesar_liberar_asiento();
 int procesar_estado_asiento();
 int procesar_estado_sala();
 int procesar_cerrar_sala();
+int procesar_ayuda();
 #endif
