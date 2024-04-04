@@ -3,6 +3,6 @@
 
 void main()
 {
-    leer_shell();
+    leer_shell();//lee la terminal hasta que se use el comando salir
 	exit(0);
 }

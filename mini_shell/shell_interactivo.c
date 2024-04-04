@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "shell_interactivo.h"
 #include "sala.h"
 #include "error_manager.h"
@@ -32,7 +33,7 @@ int procesar_input(char* input)
 
     }else if(!strcmp(comando, "libera"))
     {
-        //procesar_liberar_asiento();
+        procesar_liberar_asiento();
 
     }else if(!strcmp(comando, "estado_asiento"))
     {
@@ -44,8 +45,7 @@ int procesar_input(char* input)
     
     }else if(!strcmp(comando, "cerrar_sala"))
     {
-        procesar_cerrar_sala();
-        return true;
+        if(procesar_cerrar_sala() == true) return true;
     }
     return false;
 }
@@ -56,18 +56,24 @@ int procesar_crear_sala(char *ciudad, int capacidad)
     {
         case ERROR_SALA_ABIERTA:
             printf("Ya hay una sala creada.\n");
+            sleep(5);
             exit(1);
             break;
         case ERROR_SALA_CAPACIDAD:
             printf("La capacidad de la sala no es valida.\n");
+            sleep(5);
+            exit(1);
             break; 
         case ERROR_MEMORIA:
             printf("Se ha producido un error de memoria.\n");
+            sleep(5);
+            exit(1);
             break;
         default:
             printf("SUCURSAL CREADA\n");
             printf("Nombre: %s.\n", ciudad);
             printf("Capacidad: %d.\n", capacidad);
+            procesar_ayuda();
             break;
     }
     return 0;
@@ -95,8 +101,9 @@ int procesar_reservar_asiento()
     return 0;
 }
 int procesar_liberar_asiento()
-{//WIP
+{
     int id_persona = atoi(strtok(NULL, " "));
+    int id_asiento = 0;
     bool persona_sentada = false;
     int estado_proceso;
     for(int i=1; i<=capacidad_sala(); i++)
@@ -104,9 +111,31 @@ int procesar_liberar_asiento()
 		if(estado_asiento(i) == id_persona)
         {
             persona_sentada = true;
+            id_asiento = i;
+            break;
         }
 	}
-    return 1;
+    if(persona_sentada = true)
+    {
+        estado_proceso = libera_asiento(id_asiento);
+    }
+    switch (estado_proceso)
+    {
+        case ERROR_SALA_CERRADA:
+            printf("La sala no se ha creado todavia.\n");
+            break;
+        case ERROR_ID_ASIENTO:
+            printf("El numero de asiento no es valido.\n");
+            break;
+        case ERROR_ASIENTO_VACIO:
+            printf("El asiento %d esta vacio.\n", id_asiento);
+            break;
+        default:
+            printf("El asiento %d ocupado por el id %d ha sido liberado.\n",
+                    id_asiento, estado_proceso);
+            break;
+    }
+    return 0;
 }
 int procesar_estado_asiento()
 {
@@ -148,7 +177,7 @@ int procesar_estado_sala()
 	{
 		asiento = estado_asiento(i) <= 0 ? ' ' : 'x';  
 		printf("[%c]", asiento);
-		if(i % 30 == 0) printf("\n");
+		if(i % 20 == 0) printf("\n");
 	}
     printf("\n");
 	fflush(stdout);
@@ -161,17 +190,17 @@ int procesar_cerrar_sala()
     {
         case ERROR_SALA_CERRADA:
             printf("No hay una sala abierta.\n");
+            return false;
             break;
         default:
             printf("Se ha cerrado la sala correctamente.\n");
             break;
     }
-    return 0;
+    return true;
 }
 int procesar_ayuda()
 {
     printf("Guia de Comandos:\n"
-            "-crear_sala \n"
             "-reserva <id_persona>\n"
             "-libera <id_persona>\n"
             "-estado_asiento <id_asiento>\n"

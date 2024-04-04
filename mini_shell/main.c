@@ -7,6 +7,7 @@ void main(int argc, char *argv[])
 {
     if(argc != 3) printf("Error");
     procesar_crear_sala(argv[1], atoi(argv[2]));
-	leer_shell();
+	leer_shell();//lee la terminal hasta que se cierre la sala
     exit(0);
+   
 }

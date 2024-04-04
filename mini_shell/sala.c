@@ -44,7 +44,7 @@ int estado_asiento (int id_asiento)
 {
   if(!sala_creada) return ERROR_SALA_CERRADA;
   if (id_asiento > num_asientos || id_asiento <= 0)return ERROR_ID_ASIENTO;
-  return *(ptr_ini_sala + id_asiento - 1) == -1 ? ERROR_ASIENTO_VACIO : *(ptr_ini_sala + id_asiento - 1);//devolvemos el id_persona o un 0 si esta vacio 
+  return *(ptr_ini_sala + id_asiento - 1) == -1 ? ERROR_ASIENTO_VACIO : *(ptr_ini_sala + id_asiento - 1);
 }
 
 int asientos_libres (){if(!sala_creada) return ERROR_SALA_CERRADA; return num_asientos - num_asientos_ocupados;}
