@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "error_manager.h": "c",
+        "shell_interactivo.h": "c"
+    }
+}

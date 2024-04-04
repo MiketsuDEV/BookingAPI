@@ -2,28 +2,47 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <stdlib.h>
+#include <string.h>
 #include "crear_procesos.h"
+#include "../mini_shell/error_manager.h"
 
 
-void crear_sucursal(const char *ciudad,int capacidad){	// aqui hacemos la llamada a minishell con creacion de procesos con fork y exec
+void crear_sucursal(char *ciudad,  char *capacidad){	// aqui hacemos la llamada a minishell con creacion de procesos con fork y exec
 	int pid_t = fork();
 	if (pid_t == 0){	// proceso hijo
-		char *tira[] = {"xterm","-c","&", "./mini_shell/mini_shell",NULL};		
+		char *tira[] = {"xterm","-e", "../mini_shell/mini_shell", ciudad, capacidad,  NULL};		
 		execvp("xterm",tira);
 		
-		
-	}else if(pid_t >1){
-		wait(NULL);
-	}else{
-		perror("error llamando al fork");
 	}
 }
 
-void main(int argc, char *argv[])
+void leer_shell()
 {
-	crear_sucursal(argv[1], atoi(argv[2]));
-	exit(0);
+	bool exit = false;
+    while(!exit)
+    {
+        char input[256];
+        fgets(input, 256, stdin);
+        exit = procesar_input(input);
+    }
 }
+int procesar_input(char* input)
+{
+    input[strcspn(input, "\n")] = 0; // quitar el salto de linea
+    
+    //procesamos el comando a realizar
+    char* comando = strtok(input, " ");
+    if(!strcmp(comando, "crear_sucursal"))
+    {
+        char *ciudad = strtok(NULL, " ");
+		char *capacidad = strtok(NULL, " ");
+		crear_sucursal(ciudad, capacidad);
 
 
+	}else if(!strcmp(comando, "salir"))
+	{
+		return true;
+	}
+	return false;
+}
 

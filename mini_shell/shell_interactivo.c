@@ -19,50 +19,44 @@ void leer_shell()
 int procesar_input(char* input)
 {
     input[strcspn(input, "\n")] = 0; // quitar el salto de linea
-    if(!strcmp(input, "salir")) return true;
     
     //procesamos el comando a realizar
     char* comando = strtok(input, " ");
-    if(!strcmp(comando, "crear_sala"))
+    if(!strcmp(comando, "ayuda"))
     {
-        procesar_crear_sala();
+        procesar_ayuda();
 
     }else if(!strcmp(comando, "reserva"))
     {
         procesar_reservar_asiento();
-        return false;
 
     }else if(!strcmp(comando, "libera"))
     {
         //procesar_liberar_asiento();
-        printf("WIP");
-        return false;
+
     }else if(!strcmp(comando, "estado_asiento"))
     {
         procesar_estado_asiento();
-        return false;
+        
     }else if(!strcmp(comando, "estado_sala"))
     {
         procesar_estado_sala();
-        return false;
+    
     }else if(!strcmp(comando, "cerrar_sala"))
     {
         procesar_cerrar_sala();
-        return false;
-    }else if(!strcmp(comando, "ayuda"))
-    {
-        procesar_ayuda();
+        return true;
     }
     return false;
 }
-int procesar_crear_sala()
+int procesar_crear_sala(char *ciudad, int capacidad)
 {
-    int capacidad_sala = atoi(strtok(NULL, " "));
-    int estado_proceso = crea_sala(capacidad_sala);
+    int estado_proceso = crea_sala(capacidad);
     switch (estado_proceso)
     {
         case ERROR_SALA_ABIERTA:
-            printf("Ya existe una sala creada.\n");
+            printf("Ya hay una sala creada.\n");
+            exit(1);
             break;
         case ERROR_SALA_CAPACIDAD:
             printf("La capacidad de la sala no es valida.\n");
@@ -71,7 +65,9 @@ int procesar_crear_sala()
             printf("Se ha producido un error de memoria.\n");
             break;
         default:
-            printf("Se ha creado una sala con %d asientos.\n", estado_proceso);
+            printf("SUCURSAL CREADA\n");
+            printf("Nombre: %s.\n", ciudad);
+            printf("Capacidad: %d.\n", capacidad);
             break;
     }
     return 0;
@@ -181,7 +177,6 @@ int procesar_ayuda()
             "-estado_asiento <id_asiento>\n"
             "-estado_sala\n"
             "-cerrar_sala\n"
-            "-salir\n"
             );
     return 0;
 }
