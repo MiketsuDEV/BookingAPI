@@ -47,11 +47,11 @@ int estado_asiento (int id_asiento)
   return *(ptr_ini_sala + id_asiento - 1) == -1 ? ERROR_ASIENTO_VACIO : *(ptr_ini_sala + id_asiento - 1);//devolvemos el id_persona o un 0 si esta vacio 
 }
 
-int asientos_libres (){return num_asientos - num_asientos_ocupados;}
+int asientos_libres (){if(!sala_creada) return ERROR_SALA_CERRADA; return num_asientos - num_asientos_ocupados;}
 
-int asientos_ocupados(){return num_asientos_ocupados;}
+int asientos_ocupados(){if(!sala_creada) return ERROR_SALA_CERRADA; return num_asientos_ocupados;}
 
-int capacidad_sala(){return num_asientos;}
+int capacidad_sala(){if(!sala_creada) return ERROR_SALA_CERRADA; return num_asientos;}
 
 int crea_sala (int capacidad)
 {
@@ -67,7 +67,7 @@ int crea_sala (int capacidad)
     *ptr = -1;//ini todos los asientos vacios (-1)
   }
   
-  sala_creada = true;
+  sala_creada = true; 
   num_asientos_ocupados = 0;//reset variables
   return num_asientos = capacidad; //devuelve la capacidad de la sala creada 
 }

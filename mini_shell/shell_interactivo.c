@@ -61,18 +61,18 @@ int procesar_crear_sala()
     int estado_proceso = crea_sala(capacidad_sala);
     switch (estado_proceso)
     {
-    case ERROR_SALA_ABIERTA:
-        printf("Ya existe una sala creada.\n");
-        break;
-    case ERROR_SALA_CAPACIDAD:
-        printf("La capacidad de la sala no es valida.\n");
-        break; 
-    case ERROR_MEMORIA:
-        printf("Se ha producido un error de memoria.\n");
-        break;
-    default:
-        printf("Se ha creado una sala con %d asientos.\n", estado_proceso);
-        break;
+        case ERROR_SALA_ABIERTA:
+            printf("Ya existe una sala creada.\n");
+            break;
+        case ERROR_SALA_CAPACIDAD:
+            printf("La capacidad de la sala no es valida.\n");
+            break; 
+        case ERROR_MEMORIA:
+            printf("Se ha producido un error de memoria.\n");
+            break;
+        default:
+            printf("Se ha creado una sala con %d asientos.\n", estado_proceso);
+            break;
     }
     return 0;
 }
@@ -82,19 +82,19 @@ int procesar_reservar_asiento()
     int estado_proceso = reserva_asiento(id_persona);
     switch (estado_proceso)
     {
-    case ERROR_SALA_CERRADA:
-        printf("La sala no se ha creado todavia.\n");
-        break;
-    case ERROR_SALA_LLENA:
-        printf("La sala ya esta llena.\n");
-        break;
-    case ERROR_ID_PERSONA:
-        printf("El id de persona no es valido.\n");
-        break;
-    default:
-        printf("Se ha reservado el asiento %d para el id de persona %d.\n",
-                estado_proceso, id_persona);
-        break;
+        case ERROR_SALA_CERRADA:
+            printf("La sala no se ha creado todavia.\n");
+            break;
+        case ERROR_SALA_LLENA:
+            printf("La sala ya esta llena.\n");
+            break;
+        case ERROR_ID_PERSONA:
+            printf("El id de persona no es valido.\n");
+            break;
+        default:
+            printf("Se ha reservado el asiento %d para el id de persona %d.\n",
+                    estado_proceso, id_persona);
+            break;
     }
     return 0;
 }
@@ -118,26 +118,32 @@ int procesar_estado_asiento()
     int estado_proceso = estado_asiento(id_asiento);
     switch (estado_proceso)
     {
-    case ERROR_SALA_CERRADA:
-        printf("La sala no se ha creado todavia.\n");
-        break;
-    case ERROR_ID_ASIENTO:
-        printf("El numero de asiento no es valido.\n");
-        break;
-    case ERROR_ASIENTO_VACIO:
-        printf("El asiento %d esta vacio.\n", id_asiento);
-        break;
-    default:
-        printf("El asiento %d esta ocupado por el id de persona %d.\n",
-                id_asiento, estado_proceso);
-        break;
+        case ERROR_SALA_CERRADA:
+            printf("La sala no se ha creado todavia.\n");
+            break;
+        case ERROR_ID_ASIENTO:
+            printf("El numero de asiento no es valido.\n");
+            break;
+        case ERROR_ASIENTO_VACIO:
+            printf("El asiento %d esta vacio.\n", id_asiento);
+            break;
+        default:
+            printf("El asiento %d esta ocupado por el id de persona %d.\n",
+                    id_asiento, estado_proceso);
+            break;
     }
     return 0;
 }
 int procesar_estado_sala()
 {
 	printf("Estado Sala: ");
-	capacidad_sala() == 0 ? printf("cerrada.\n") : printf("abierta.\n");
+	if(capacidad_sala() == ERROR_SALA_CERRADA)
+    {
+        printf("cerrada.\n");
+        return 0;
+
+    }
+    printf("abierta.\n");
 	printf("Aforo: %d.\n", capacidad_sala());
 	printf("Asientos ocupados: %d.\n", asientos_ocupados());
 	printf("Asientos libres: %d.\n", asientos_libres());
@@ -157,12 +163,12 @@ int procesar_cerrar_sala()
     int estado_proceso = elimina_sala();
     switch (estado_proceso)
     {
-    case ERROR_SALA_CERRADA:
-        printf("No hay una sala abierta.\n");
-        break;
-    default:
-        printf("Se ha cerrado la sala correctamente.\n");
-        break;
+        case ERROR_SALA_CERRADA:
+            printf("No hay una sala abierta.\n");
+            break;
+        default:
+            printf("Se ha cerrado la sala correctamente.\n");
+            break;
     }
     return 0;
 }

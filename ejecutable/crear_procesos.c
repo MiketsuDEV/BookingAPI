@@ -8,7 +8,7 @@
 void crear_sucursal(const char *ciudad,int capacidad){	// aqui hacemos la llamada a minishell con creacion de procesos con fork y exec
 	int pid_t = fork();
 	if (pid_t == 0){	// proceso hijo
-		char *tira[] = {"xterm","-e", "./mini_shell/mini_shell",NULL};		
+		char *tira[] = {"xterm","-c","&", "./mini_shell/mini_shell",NULL};		
 		execvp("xterm",tira);
 		
 		
