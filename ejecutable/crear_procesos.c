@@ -28,7 +28,7 @@ void crear_sucursal(char *ciudad,  char *capacidad){	// aqui hacemos la llamada 
 			perror("error al esperar al hijo");
 		}else if(result >0){
 			if(WIFEXITED(status)){
-				printf("El hijo con el PID %d y con nombre de %d ha terminado con codigo de salida %d \n",hijos[i],ciudad,WIFEXITED(status));
+				printf("El hijo con el PID %d y con nombre de %s ha terminado con codigo de salida %d \n",hijos[i],ciudad,WIFEXITED(status));
 				hijos[i] = hijos[--num_hijos];
 			}
 		}
