@@ -61,6 +61,11 @@ int procesar_input(char* input)
     {
         char *ciudad = strtok(NULL, " ");
 		char *capacidad = strtok(NULL, " ");
+		if(ciudad == NULL && capacidad == NULL)
+		{
+			printf("Error en los parametros de la sucursal.\n");
+			return false;	
+		}
 		crear_sucursal(ciudad, capacidad);
 
 
