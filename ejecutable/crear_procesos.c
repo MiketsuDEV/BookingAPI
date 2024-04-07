@@ -14,18 +14,23 @@ pid_t result;
 
 void crear_sucursal(char *ciudad,  char *capacidad){	// aqui hacemos la llamada a minishell con creacion de procesos con fork y exec
 	int pid_t = fork();
-	if (pid_t == 0){	// proceso hijo
-		char *tira[] = {"xterm","-e", "../mini_shell/mini_shell", ciudad, capacidad,  NULL};		
-		execvp("xterm",tira);
-		
+	if (pid_t == -1){
+		perror("error al crear un nuevo proceso");
 	}else{
-		for(int i=0; i< MAXIMO_SUCURSALES;i++)
-		{
-			if(hijos[i] == -1)
+
+		if (pid_t == 0){	// proceso hijo
+			char *tira[] = {"xterm","-e", "../mini_shell/mini_shell", ciudad, capacidad,  NULL};		
+			execvp("xterm",tira);
+		
+		}else{
+			for(int i=0; i< MAXIMO_SUCURSALES;i++)
 			{
-				hijos[i] = pid_t;
-				strcpy(ciudades[i], ciudad);
-				break;
+				if(hijos[i] == -1)
+				{
+					hijos[i] = pid_t;
+					strcpy(ciudades[i], ciudad);
+					break;
+				}
 			}
 		}
 	}
