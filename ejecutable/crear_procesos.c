@@ -6,10 +6,11 @@
 #include "crear_procesos.h"
 #include "../mini_shell/error_manager.h"
 
-pid_t hijos[10];
+#define MAXIMO_SUCURSALES 10
+pid_t hijos[MAXIMO_SUCURSALES];
+char ciudades[MAXIMO_SUCURSALES][256];
 
 pid_t result;
-int num_hijos=0;
 
 void crear_sucursal(char *ciudad,  char *capacidad){	// aqui hacemos la llamada a minishell con creacion de procesos con fork y exec
 	int pid_t = fork();
@@ -18,18 +19,13 @@ void crear_sucursal(char *ciudad,  char *capacidad){	// aqui hacemos la llamada 
 		execvp("xterm",tira);
 		
 	}else{
-		hijos[num_hijos++] = pid_t;
-	}
-
-	for (int i =0;i<num_hijos;i++){
-		int status;
-		result = waitpid(hijos[i],&status,WNOHANG);
-		if(result == -1){
-			perror("error al esperar al hijo");
-		}else if(result >0){
-			if(WIFEXITED(status)){
-				printf("El hijo con el PID %d y con nombre de %s ha terminado con codigo de salida %d \n",hijos[i],ciudad,WIFEXITED(status));
-				hijos[i] = hijos[--num_hijos];
+		for(int i=0; i< MAXIMO_SUCURSALES;i++)
+		{
+			if(hijos[i] == -1)
+			{
+				hijos[i] = pid_t;
+				strcpy(ciudades[i], ciudad);
+				break;
 			}
 		}
 	}
@@ -37,12 +33,17 @@ void crear_sucursal(char *ciudad,  char *capacidad){	// aqui hacemos la llamada 
 
 void leer_shell()
 {
+	for(int i=0; i< MAXIMO_SUCURSALES;i++)
+	{
+		hijos[i]= -1;
+	}
 	bool exit = false;
     while(!exit)
     {
         char input[256];
         fgets(input, 256, stdin);
         exit = procesar_input(input);
+		comprobar_hijos();
     }
 }
 int procesar_input(char* input)
@@ -64,4 +65,21 @@ int procesar_input(char* input)
 	}
 	return false;
 }
-
+int comprobar_hijos()
+{
+	for (int i =0;i<MAXIMO_SUCURSALES;i++){
+		if(hijos[i] != -1)
+		{
+			int status;
+			result = waitpid(hijos[i],&status,WNOHANG);
+			if(result == -1){
+				perror("error al esperar al hijo");
+			}else if(result >0){
+				if(WIFEXITED(status)){
+					printf("La sucursal %s  con  PID %d ha cerrado.\n",ciudades[i],hijos[i]);
+					hijos[i] = -1;
+				}
+			}
+		}
+	}
+}
