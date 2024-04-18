@@ -16,6 +16,7 @@ int reserva_asiento(int id_persona)
 {
   if(!sala_creada){return ERROR_SALA_CERRADA;}
   if(id_persona <= 0){return ERROR_ID_PERSONA;}
+  if(num_asientos == num_asientos_ocupados){return ERROR_SALA_LLENA;}
   for(ptr=ptr_ini_sala;ptr<=ptr_fin_sala;ptr++)
   { 
     if(*ptr == -1)
@@ -25,7 +26,6 @@ int reserva_asiento(int id_persona)
       return ptr - ptr_ini_sala + 1;
     } 
   }
-  return ERROR_SALA_LLENA;
 }
 
 int libera_asiento (int id_asiento)
