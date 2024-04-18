@@ -5,5 +5,5 @@
 
 void main(int argc, char *argv[])
 {
-   procesar_orden(argc, argv);
+    procesar_orden(argc, argv);
 }
