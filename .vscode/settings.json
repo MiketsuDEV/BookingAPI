@@ -3,6 +3,7 @@
         "error_manager.h": "c",
         "shell_interactivo.h": "c",
         "crear_procesos.h": "c",
-        "wait.h": "c"
+        "wait.h": "c",
+        "gestor_ficheros.h": "c"
     }
 }

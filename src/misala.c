@@ -1,14 +1,19 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <getopt.h>
 #include <string.h>
 #include "error_manager.h"
+#include "sala.h"
+#include "gestor_ficheros.h"
+#include "misala.h"
+
+bool fflag, cflag, oflag = false;
 
 int procesar_orden(int argc, char *argv[])
 {
-    char* orden = argv[1];
     char opt;
-    bool fflag, cflag = false;
+   
     while((opt = getopt(argc, argv, "fc")) != -1)
     {
         switch (opt)
@@ -20,29 +25,38 @@ int procesar_orden(int argc, char *argv[])
                 cflag = true;
                 break;
         
-            default:
+            case 'o':
+                oflag = true;
                 break;
         }
     }
-    for(; optind <  argc; optind ++)
-    {
-        printf("%s\n", argv[optind]);
-    }
-    if(fflag) printf("F\n");
-    if(cflag) printf("C\n");
+    char* orden = argv[optind];
+    optind++;
+  
 
     if(!strcmp(orden, "crea"))
     {
+        procesar_crea(argc, argv);
 
     }else if(!strcmp(orden, "reserva"))
     {
+        //procesar_reserva();
 
     }else if(!strcmp(orden, "anula"))
     {
-        
+        //procesar_anula();
+
     }else if (!strcmp(orden, "estado"))
     {
-
+        //procesar_estado();
     }
+
+}
+int procesar_crea(int argc, char *argv[])
+{
+    char* ruta = argv[optind]; optind++;
+    int capacidad = atoi(argv[optind]); optind++;
+    crea_sala(capacidad);
+    guarda_estado_sala(ruta, oflag);
 
 }
