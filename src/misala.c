@@ -24,7 +24,6 @@ int procesar_orden(int argc, char *argv[])
             case 'c':
                 cflag = true;
                 break;
-        
             case 'o':
                 oflag = true;
                 break;
@@ -40,7 +39,7 @@ int procesar_orden(int argc, char *argv[])
 
     }else if(!strcmp(orden, "reserva"))
     {
-        //procesar_reserva();
+        procesar_reserva(argc, argv);
 
     }else if(!strcmp(orden, "anula"))
     {
@@ -58,5 +57,10 @@ int procesar_crea(int argc, char *argv[])
     int capacidad = atoi(argv[optind]); optind++;
     crea_sala(capacidad);
     guarda_estado_sala(ruta, oflag);
+    elimina_sala();
 
+}
+int procesar_reserva(int argc, char *argv[])
+{
+    char* ruta = argv[optind]; optind++;
 }
