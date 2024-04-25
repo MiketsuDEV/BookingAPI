@@ -4,6 +4,8 @@
         "shell_interactivo.h": "c",
         "crear_procesos.h": "c",
         "wait.h": "c",
-        "gestor_ficheros.h": "c"
+        "gestor_ficheros.h": "c",
+        "sala.h": "c",
+        "unistd.h": "c"
     }
 }

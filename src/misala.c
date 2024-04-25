@@ -14,7 +14,7 @@ int procesar_orden(int argc, char *argv[])
 {
     char opt;
    
-    while((opt = getopt(argc, argv, "fc")) != -1)
+    while((opt = getopt(argc, argv, "fco")) != -1)
     {
         switch (opt)
         {
@@ -47,7 +47,7 @@ int procesar_orden(int argc, char *argv[])
 
     }else if (!strcmp(orden, "estado"))
     {
-        //procesar_estado();
+        procesar_estado(argc, argv);
     }
 
 }
@@ -63,4 +63,23 @@ int procesar_crea(int argc, char *argv[])
 int procesar_reserva(int argc, char *argv[])
 {
     char* ruta = argv[optind]; optind++;
+}
+int procesar_estado(int argc, char *argv[])
+{
+    char* ruta = argv[optind]; optind++;
+    recupera_estado_sala(ruta);
+    printf("Aforo: %d.\n", capacidad_sala());
+	printf("Asientos ocupados: %d.\n", asientos_ocupados());
+	printf("Asientos libres: %d.\n", asientos_libres());
+	char asiento;
+	for(int i=1; i<=capacidad_sala(); i++)
+	{
+		asiento = estado_asiento(i) <= 0 ? ' ' : 'x';  
+		printf("[%c]", asiento);
+		if(i % 20 == 0) printf("\n");
+	}
+    printf("\n");
+	fflush(stdout);
+    return 0;
+    elimina_sala();
 }

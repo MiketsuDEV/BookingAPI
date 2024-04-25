@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 #include "error_manager.h"
 #include "gestor_ficheros.h"
 #include "sala.h"
@@ -14,10 +15,11 @@ int guarda_estado_sala(const char* ruta_fichero, bool oflag)
 {
     int fd;
     if(oflag){
-        fd = open(ruta_fichero, O_WRONLY | O_CREAT | O_TRUNC, 644);
+        fd = open(ruta_fichero, O_WRONLY | O_CREAT  |  O_TRUNC, 0644);
     }else{
         fd = open(ruta_fichero, O_WRONLY | O_CREAT | O_EXCL);
     }
+    
     struct stat *buf;
     buf = malloc(sizeof(struct stat));
     stat(ruta_fichero, buf);
@@ -26,8 +28,10 @@ int guarda_estado_sala(const char* ruta_fichero, bool oflag)
     free(buf);
     int capacidad = capacidad_sala();
     int* ptr = ptr_ini_sala;
-    write(fd, capacidad_sala(), sizeof(int));
-    write(fd, asientos_ocupados(), sizeof(int));
+    int capacidad_ptr[] = {capacidad_sala()};
+    int asientos_ocupados_ptr[] = {asientos_ocupados()};
+    write(fd, capacidad_ptr, sizeof(int));
+    write(fd, asientos_ocupados_ptr, sizeof(int));
     while((capacidad - block_size) >= 0)
     {
         write(fd, ptr, block_size*sizeof(int));
@@ -36,13 +40,13 @@ int guarda_estado_sala(const char* ruta_fichero, bool oflag)
     }
     write(fd, ptr, capacidad*sizeof(int));
     
-    close(ruta_fichero);
+    close(fd);
 }
 int recupera_estado_sala(const char* ruta_fichero)
 {
     elimina_sala();
     int fd = open(ruta_fichero, O_RDONLY);
-    int* capacidad_ptr = (int)malloc(sizeof(int));
+    int* capacidad_ptr = (int*)malloc(sizeof(int));
     read(fd,capacidad_ptr,sizeof(int));
     crea_sala(*capacidad_ptr);
     read(fd,capacidad_ptr,sizeof(int));
@@ -63,7 +67,7 @@ int recupera_estado_sala(const char* ruta_fichero)
         ptr+= block_size;
     }
     read(fd, ptr, capacidad*sizeof(int));
-    close(ruta_fichero);
+    close(fd);
 }
 int guarda_estadoparcial_sala(const char* ruta_fichero, int num_asientos, int* id_asientos)
 {
