@@ -70,8 +70,12 @@ void verifica_ruta(const char *ruta){
 
 int procesar_crea(int argc, char *argv[])
 {
+<<<<<<< HEAD
     char* ruta = argv[optind]; optind++;
     verifica_ruta(ruta);
+=======
+    char* ruta = argv[optind]; optind++; 
+>>>>>>> 350e9eab63d98cb29a7b170732d4c4d5a194943f
     int capacidad = atoi(argv[optind]); optind++;
     crea_sala(capacidad);
     guarda_estado_sala(ruta, oflag);
