@@ -46,7 +46,7 @@ int procesar_orden(int argc, char *argv[])
 
     }else if(!strcmp(orden, "anula"))
     {
-        //procesar_anula();
+        procesar_anula(argc, argv);
 
     }else if (!strcmp(orden, "estado"))
     {
@@ -72,6 +72,23 @@ int procesar_reserva(int argc, char *argv[])
     for(int i = 0; optind< argc; i++,optind++)
     {
        reserva_asiento(atoi(argv[optind]));
+    }
+    guarda_estado_sala(ruta, oflag);
+    /*
+    strcpy(id_persona[i], argv[optind]);
+    num_id++;
+    */
+
+}
+int procesar_anula(int argc, char *argv[])
+{
+    char* ruta = argv[optind]; optind++;
+    recupera_estado_sala(ruta);
+    char id_asiento [MAX_ID][MAX_LONGITUD_ID];
+    int num_id = 0;
+    for(int i = 0; optind< argc; i++,optind++)
+    {
+       libera_asiento(atoi(argv[optind]));
     }
     guarda_estado_sala(ruta, oflag);
     /*
