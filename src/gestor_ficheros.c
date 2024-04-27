@@ -15,23 +15,23 @@ int guarda_estado_sala(const char* ruta_fichero, bool oflag)
 {
     int fd;
     if(oflag){
-        fd = open(ruta_fichero, O_WRONLY | O_CREAT  |  O_TRUNC, 0644);
+        fd = open(ruta_fichero, O_WRONLY | O_CREAT  |  O_TRUNC, 0666);
     }else{
-        fd = open(ruta_fichero, O_WRONLY | O_CREAT | O_EXCL);
+        fd = open(ruta_fichero, O_WRONLY);
     }
-    
+    //calculamos tamaño de bloque
     struct stat *buf;
     buf = malloc(sizeof(struct stat));
     stat(ruta_fichero, buf);
-    unsigned long block_size = buf->st_blksize;
-    block_size /= sizeof(int);
+    int block_size = (buf->st_blksize) / sizeof(int);
     free(buf);
-    int capacidad = capacidad_sala();
+
     int* ptr = ptr_ini_sala;
-    int capacidad_ptr[] = {capacidad_sala()};
-    int asientos_ocupados_ptr[] = {asientos_ocupados()};
-    write(fd, capacidad_ptr, sizeof(int));
-    write(fd, asientos_ocupados_ptr, sizeof(int));
+    int capacidad = capacidad_sala();
+    int asientos_en_uso = asientos_ocupados();
+
+    write(fd, &capacidad, sizeof(int));
+    write(fd, &asientos_en_uso, sizeof(int));
     while((capacidad - block_size) >= 0)
     {
         write(fd, ptr, block_size*sizeof(int));
@@ -46,20 +46,21 @@ int recupera_estado_sala(const char* ruta_fichero)
 {
     elimina_sala();
     int fd = open(ruta_fichero, O_RDONLY);
-    int* capacidad_ptr = (int*)malloc(sizeof(int));
-    read(fd,capacidad_ptr,sizeof(int));
-    crea_sala(*capacidad_ptr);
-    read(fd,capacidad_ptr,sizeof(int));
-    num_asientos_ocupados = *capacidad_ptr;
-    free(capacidad_ptr);
+    //calculamos tamaño de bloque
     struct stat *buf;
     buf = malloc(sizeof(struct stat));
     stat(ruta_fichero, buf);
-    unsigned long block_size = buf->st_blksize;
-    block_size /= sizeof(int);
+    int block_size = (buf->st_blksize) / sizeof(int);
     free(buf);
+
+    int capacidad;
+    read(fd,&capacidad,sizeof(int));
+    crea_sala(capacidad);
+    read(fd,&capacidad,sizeof(int));
+    num_asientos_ocupados = capacidad;
+    
     int* ptr = ptr_ini_sala;
-    int capacidad = capacidad_sala();
+    capacidad = capacidad_sala();
     while((capacidad - block_size) >= 0)
     {
         read(fd, ptr, block_size*sizeof(int));

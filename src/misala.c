@@ -10,6 +10,9 @@
 
 bool fflag, cflag, oflag = false;
 
+#define MAX_ID 10
+#define MAX_LONGITUD_ID 4
+
 int procesar_orden(int argc, char *argv[])
 {
     char opt;
@@ -63,6 +66,19 @@ int procesar_crea(int argc, char *argv[])
 int procesar_reserva(int argc, char *argv[])
 {
     char* ruta = argv[optind]; optind++;
+    recupera_estado_sala(ruta);
+    char id_persona [MAX_ID][MAX_LONGITUD_ID];
+    int num_id = 0;
+    for(int i = 0; optind< argc; i++,optind++)
+    {
+       reserva_asiento(atoi(argv[optind]));
+    }
+    guarda_estado_sala(ruta, oflag);
+    /*
+    strcpy(id_persona[i], argv[optind]);
+    num_id++;
+    */
+
 }
 int procesar_estado(int argc, char *argv[])
 {
