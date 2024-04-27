@@ -39,7 +39,8 @@ int guarda_estado_sala(const char* ruta_fichero, bool oflag)
     }
     if((write(fd, ptr, capacidad*sizeof(int))) == -1){perror("Error al escribir en el archivo");exit(-1);}
     
-    if(close(fd) == -1){perror("Error al cerrar el archivo");};
+    if(close(fd) == -1){perror("Error al cerrar el archivo");exit(-1);}
+    return 0;
 }
 int recupera_estado_sala(const char* ruta_fichero)
 {
@@ -63,7 +64,8 @@ int recupera_estado_sala(const char* ruta_fichero)
         ptr+= block_size;
     }
     if((read(fd, ptr, capacidad*sizeof(int))) == -1){perror("Error al leer el archivo");exit(-1);}
-    if(close(fd) == -1){perror("Error al cerrar el archivo");}
+    if(close(fd) == -1){perror("Error al cerrar el archivo");exit(-1);}
+    return 0;
 }
 
 int guarda_estadoparcial_sala(const char* ruta_fichero, int num_asientos, int* id_asientos)
@@ -79,12 +81,26 @@ int guarda_estadoparcial_sala(const char* ruta_fichero, int num_asientos, int* i
         id = estado_asiento(id);
         if((write(fd, &id, sizeof(int))) == -1){perror("Error al escribir en el archivo");exit(-1);}
     }
-    if(close(fd) == -1){perror("Error al cerrar el archivo");}
+    if(close(fd) == -1){perror("Error al cerrar el archivo");exit(-1);}
+    return 0;
 
 }
 int recupera_estadoparcial_sala(const char* ruta_fichero, int num_asientos, int* id_asientos)
 {
+    int fd = open(ruta_fichero, O_RDONLY);
+    if(fd == -1){perror("Error al abrir el archivo");exit(-1);}
+    int block_size = calcular_blk_size(ruta_fichero);
+    for(int i = 0;i<num_asientos;i++)
+    {
+        int id = id_asientos[i];
+        if(lseek(fd,(id+1)*sizeof(int),SEEK_SET) == -1){perror("Error al mover el puntero del archivo");exit(-1);}
+        int id_persona;
+        if((read(fd, &id_persona, sizeof(int))) == -1){perror("Error al escribir en el archivo");exit(-1);}
+        ptr_ini_sala[id] = id_persona;
+    }
 
+    if(close(fd) == -1){perror("Error al cerrar el archivo");exit(-1);}
+    return 0;
 }
 
 int calcular_blk_size(const char* ruta_fichero)
