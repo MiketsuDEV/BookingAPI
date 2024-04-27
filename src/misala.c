@@ -7,6 +7,7 @@
 #include "sala.h"
 #include "gestor_ficheros.h"
 #include "misala.h"
+#include "errno.h"
 
 bool fflag, cflag, oflag = false;
 
@@ -54,9 +55,23 @@ int procesar_orden(int argc, char *argv[])
     }
 
 }
+
+void verifica_ruta(const char *ruta){
+	if(access(ruta, F_OK)==-1){
+		fprintf(stderr,"la ruta %s no existe\n",ruta);
+		exit(-1);
+	}
+	if(access(ruta,R_OK)||access(ruta,W_OK)){
+		fprintf(stderr,"no se tienen los permisos adecuados\n");
+		exit(-1);
+	}
+}
+
+
 int procesar_crea(int argc, char *argv[])
 {
     char* ruta = argv[optind]; optind++;
+    verifica_ruta(ruta);
     int capacidad = atoi(argv[optind]); optind++;
     crea_sala(capacidad);
     guarda_estado_sala(ruta, oflag);
@@ -66,11 +81,18 @@ int procesar_crea(int argc, char *argv[])
 int procesar_reserva(int argc, char *argv[])
 {
     char* ruta = argv[optind]; optind++;
+    verifica_ruta(ruta);
     recupera_estado_sala(ruta);
-    char id_persona [MAX_ID][MAX_LONGITUD_ID];
-    int num_id = 0;
+    int asientos = asientos_libres();
+    int personas = argc - optind;
+    if (asientos < personas){
+    	fprintf(stderr, "no se pudo realizar la reserva, no hya suficientes asientos \n");
+    	return 1;
+    }
+    
     for(int i = 0; optind< argc; i++,optind++)
     {
+    	
        reserva_asiento(atoi(argv[optind]));
     }
     guarda_estado_sala(ruta, oflag);
@@ -83,6 +105,7 @@ int procesar_reserva(int argc, char *argv[])
 int procesar_anula(int argc, char *argv[])
 {
     char* ruta = argv[optind]; optind++;
+    verifica_ruta(ruta);
     recupera_estado_sala(ruta);
     char id_asiento [MAX_ID][MAX_LONGITUD_ID];
     int num_id = 0;
@@ -100,6 +123,7 @@ int procesar_anula(int argc, char *argv[])
 int procesar_estado(int argc, char *argv[])
 {
     char* ruta = argv[optind]; optind++;
+    verifica_ruta(ruta);
     recupera_estado_sala(ruta);
     printf("Aforo: %d.\n", capacidad_sala());
 	printf("Asientos ocupados: %d.\n", asientos_ocupados());
