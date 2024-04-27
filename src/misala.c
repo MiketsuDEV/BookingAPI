@@ -56,7 +56,7 @@ int procesar_orden(int argc, char *argv[])
 }
 int procesar_crea(int argc, char *argv[])
 {
-    char* ruta = argv[optind]; optind++;
+    char* ruta = argv[optind]; optind++; 
     int capacidad = atoi(argv[optind]); optind++;
     crea_sala(capacidad);
     guarda_estado_sala(ruta, oflag);
