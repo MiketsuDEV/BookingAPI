@@ -11,47 +11,56 @@
 
 bool fflag, cflag, oflag = false;
 
+
 #define MAX_ID 10
 #define MAX_LONGITUD_ID 4
 
 int procesar_orden(int argc, char *argv[])
 {
+    extern char *optarg;
+    extern int optind;
     char opt;
-   
-    while((opt = getopt(argc, argv, "fco")) != -1)
+    int capacidad;
+    char* ruta;
+    while((opt = getopt(argc, argv, "f:c:o:")) != -1)
     {
         switch (opt)
         {
             case 'f':
                 fflag = true;
+                ruta = optarg;
+                if(!strcmp(ruta, "o"))
+                {
+                    oflag = true;
+                }
                 break;
             case 'c':
                 cflag = true;
-                break;
-            case 'o':
-                oflag = true;
+                capacidad = atoi(optarg);
                 break;
         }
     }
-    char* orden = argv[optind];
-    optind++;
+    char* orden = argv[optind]; optind++;
+
+    if(oflag){ruta = argv[optind];optind++;}
+    
   
 
     if(!strcmp(orden, "crea"))
     {
-        procesar_crea(argc, argv);
+        procesar_crea(ruta, capacidad);
 
     }else if(!strcmp(orden, "reserva"))
     {
-        procesar_reserva(argc, argv);
+        procesar_reserva(ruta, argc, argv);
 
     }else if(!strcmp(orden, "anula"))
     {
-        procesar_anula(argc, argv);
+        procesar_anula(ruta, argc, argv);
 
     }else if (!strcmp(orden, "estado"))
     {
-        procesar_estado(argc, argv);
+        procesar_estado(ruta);
     }
 
 }
@@ -69,27 +78,22 @@ void verifica_ruta(const char *ruta){
 
 
 
-int procesar_crea(int argc, char *argv[])
+int procesar_crea(char* ruta, int capacidad)
 {
-
-    char* ruta = argv[optind]; optind++;
-    //verifica_ruta(ruta); 
-    int capacidad = atoi(argv[optind]); optind++;
-    crea_sala(capacidad);
-    guarda_estado_sala(ruta, true,oflag);
-    elimina_sala();
+    if(crea_sala(capacidad) < 0){fprintf(stderr,"Error al crear la sala.\n");exit(-1);}
+    guarda_estado_sala(ruta, true, oflag);
+    if(elimina_sala() < 0){fprintf(stderr,"Error al eliminar la sala.\n");exit(-1);}
 
 }
-int procesar_reserva(int argc, char *argv[])
+int procesar_reserva(char* ruta, int argc, char *argv[])
 {
-    char* ruta = argv[optind]; optind++;
     verifica_ruta(ruta);
     recupera_estado_sala(ruta);
     int asientos = asientos_libres();
     int personas = argc - optind;
     if (asientos < personas){
-    	fprintf(stderr, "no se pudo realizar la reserva, no hya suficientes asientos \n");
-    	return 1;
+    	fprintf(stderr, "no se pudo realizar la reserva, no hay suficientes asientos \n");
+    	exit(-1);
     }
     
     for(int i = 0; optind< argc; i++,optind++)
@@ -98,12 +102,11 @@ int procesar_reserva(int argc, char *argv[])
        reserva_asiento(atoi(argv[optind]));
     }
     guarda_estado_sala(ruta, false,oflag);
-   
-
+    if(elimina_sala() < 0){fprintf(stderr,"Error al eliminar la sala.\n");exit(-1);}
 }
-int procesar_anula(int argc, char *argv[])
+
+int procesar_anula(char* ruta, int argc, char *argv[])
 {
-    char* ruta = argv[optind]; optind++;
     verifica_ruta(ruta);
     recupera_estado_sala(ruta);
     for(int i = 0; optind< argc; i++,optind++)
@@ -117,12 +120,10 @@ int procesar_anula(int argc, char *argv[])
        
     }
     guarda_estado_sala(ruta, false,oflag);
-  
-
+    if(elimina_sala() < 0){fprintf(stderr,"Error al eliminar la sala.\n");exit(-1);}
 }
-int procesar_estado(int argc, char *argv[])
+int procesar_estado(char* ruta)
 {
-    char* ruta = argv[optind]; optind++;
     verifica_ruta(ruta);
     recupera_estado_sala(ruta);
     printf("Aforo: %d.\n", capacidad_sala());
@@ -137,7 +138,7 @@ int procesar_estado(int argc, char *argv[])
 	}
     printf("\n");
 	fflush(stdout);
-    elimina_sala();
+    if(elimina_sala() < 0){fprintf(stderr,"Error al eliminar la sala.\n");exit(-1);}
     return 0;
     
 }

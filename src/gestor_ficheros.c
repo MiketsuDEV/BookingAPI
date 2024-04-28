@@ -18,7 +18,7 @@ int guarda_estado_sala(const char* ruta_fichero, bool crea, bool oflag)
     int error;
 
     if(crea){
-        if(oflag == true)
+        if(oflag)
         {
             fd = open(ruta_fichero, O_WRONLY | O_CREAT  |  O_TRUNC, 0666);
         }else
