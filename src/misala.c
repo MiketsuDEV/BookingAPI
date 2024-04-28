@@ -68,14 +68,15 @@ void verifica_ruta(const char *ruta){
 }
 
 
+
 int procesar_crea(int argc, char *argv[])
 {
 
     char* ruta = argv[optind]; optind++;
-    verifica_ruta(ruta); 
+    //verifica_ruta(ruta); 
     int capacidad = atoi(argv[optind]); optind++;
     crea_sala(capacidad);
-    guarda_estado_sala(ruta, oflag);
+    guarda_estado_sala(ruta, true,oflag);
     elimina_sala();
 
 }
@@ -96,11 +97,8 @@ int procesar_reserva(int argc, char *argv[])
     	
        reserva_asiento(atoi(argv[optind]));
     }
-    guarda_estado_sala(ruta, oflag);
-    /*
-    strcpy(id_persona[i], argv[optind]);
-    num_id++;
-    */
+    guarda_estado_sala(ruta, false,oflag);
+   
 
 }
 int procesar_anula(int argc, char *argv[])
@@ -108,23 +106,18 @@ int procesar_anula(int argc, char *argv[])
     char* ruta = argv[optind]; optind++;
     verifica_ruta(ruta);
     recupera_estado_sala(ruta);
-    char id_asiento [MAX_ID][MAX_LONGITUD_ID];
-    int num_id = 0;
     for(int i = 0; optind< argc; i++,optind++)
     {
     	int ids = atoi(argv[optind]);
-    	if(atoi(argv[optind])>0 && atoi(argv[optind])<capacidad_sala()){
+    	if(ids>0 && ids < capacidad_sala()){
     		libera_asiento(ids);
     	}else{
-    		fprintf(stderr,"el asiento %d no es valido para liberar",ids);
+    		fprintf(stderr,"el asiento %d no es valido para liberar\n",ids);
     	}
        
     }
-    guarda_estado_sala(ruta, oflag);
-    /*
-    strcpy(id_persona[i], argv[optind]);
-    num_id++;
-    */
+    guarda_estado_sala(ruta, false,oflag);
+  
 
 }
 int procesar_estado(int argc, char *argv[])
@@ -144,6 +137,7 @@ int procesar_estado(int argc, char *argv[])
 	}
     printf("\n");
 	fflush(stdout);
-    return 0;
     elimina_sala();
+    return 0;
+    
 }
