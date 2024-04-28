@@ -113,18 +113,15 @@ int procesar_anula(int argc, char *argv[])
     for(int i = 0; optind< argc; i++,optind++)
     {
     	int ids = atoi(argv[optind]);
-    	if(atoi(argv[optind])>0 && atoi(argv[optind])<capacidad_sala()){
+    	if(ids>0 && ids<capacidad_sala()){
     		libera_asiento(ids);
     	}else{
-    		fprintf(stderr,"el asiento %d no es valido para liberar",ids);
+    		fprintf(stderr,"el asiento %d no es valido para liberar\n",ids);
     	}
        
     }
     guarda_estado_sala(ruta, oflag);
-    /*
-    strcpy(id_persona[i], argv[optind]);
-    num_id++;
-    */
+
 
 }
 int procesar_estado(int argc, char *argv[])
