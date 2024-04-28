@@ -12,14 +12,21 @@
 extern int* ptr_ini_sala;
 extern int num_asientos_ocupados;
 
-int guarda_estado_sala(const char* ruta_fichero, bool oflag)
+int guarda_estado_sala(const char* ruta_fichero, bool crea, bool oflag)
 {
     int fd;
     int error;
-    if(oflag){
-        fd = open(ruta_fichero, O_WRONLY | O_CREAT  |  O_TRUNC, 0666);
+
+    if(crea){
+        if(oflag == true)
+        {
+            fd = open(ruta_fichero, O_WRONLY | O_CREAT  |  O_TRUNC, 0666);
+        }else
+        {
+            fd = open(ruta_fichero, O_WRONLY | O_CREAT | O_EXCL, 0666);
+        }
     }else{
-        fd = open(ruta_fichero, O_WRONLY | O_CREAT | O_EXCL, 0666);
+        fd = open(ruta_fichero, O_WRONLY);
     }
     if(fd == -1){perror("Error al abrir el archivo");exit(-1);}
     

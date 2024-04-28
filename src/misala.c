@@ -97,11 +97,6 @@ int procesar_reserva(int argc, char *argv[])
        reserva_asiento(atoi(argv[optind]));
     }
     guarda_estado_sala(ruta, oflag);
-    /*
-    strcpy(id_persona[i], argv[optind]);
-    num_id++;
-    */
-
 }
 int procesar_anula(int argc, char *argv[])
 {
@@ -121,10 +116,6 @@ int procesar_anula(int argc, char *argv[])
        
     }
     guarda_estado_sala(ruta, oflag);
-    /*
-    strcpy(id_persona[i], argv[optind]);
-    num_id++;
-    */
 
 }
 int procesar_estado(int argc, char *argv[])
@@ -144,6 +135,6 @@ int procesar_estado(int argc, char *argv[])
 	}
     printf("\n");
 	fflush(stdout);
-    return 0;
     elimina_sala();
+    return 0;
 }
