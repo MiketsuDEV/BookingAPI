@@ -70,12 +70,9 @@ void verifica_ruta(const char *ruta){
 
 int procesar_crea(int argc, char *argv[])
 {
-<<<<<<< HEAD
+
     char* ruta = argv[optind]; optind++;
-    verifica_ruta(ruta);
-=======
-    char* ruta = argv[optind]; optind++; 
->>>>>>> 350e9eab63d98cb29a7b170732d4c4d5a194943f
+    verifica_ruta(ruta); 
     int capacidad = atoi(argv[optind]); optind++;
     crea_sala(capacidad);
     guarda_estado_sala(ruta, oflag);
@@ -115,7 +112,13 @@ int procesar_anula(int argc, char *argv[])
     int num_id = 0;
     for(int i = 0; optind< argc; i++,optind++)
     {
-       libera_asiento(atoi(argv[optind]));
+    	int ids = atoi(argv[optind]);
+    	if(atoi(argv[optind])>0 && atoi(argv[optind])<capacidad_sala()){
+    		libera_asiento(ids);
+    	}else{
+    		fprintf(stderr,"el asiento %d no es valido para liberar",ids);
+    	}
+       
     }
     guarda_estado_sala(ruta, oflag);
     /*
