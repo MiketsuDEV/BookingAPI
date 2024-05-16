@@ -106,7 +106,7 @@ int procesar_crea(char* ruta, int capacidad)
 }
 int procesar_reserva(char* ruta, int argc, char *argv[])
 {
-    verifica_ruta(ruta, "estado");
+    verifica_ruta(ruta, "reserva");
     int fd = open(ruta, O_RDONLY);
     if(fd == -1) return ERROR_FICHERO_OPEN;
     int capacidad;
