@@ -140,20 +140,47 @@ int procesar_reserva(char* ruta, int argc, char *argv[])
 
 int procesar_anula(char* ruta, int argc, char *argv[])
 {
-    //verifica_ruta(ruta);
-    recupera_estado_sala(ruta);
-    for(int i = 0; optind< argc; i++,optind++)
+    verifica_ruta(ruta, "anula");
+    int fd = open(ruta, O_RDONLY);
+    if(fd == -1) return ERROR_FICHERO_OPEN;
+    int capacidad;
+    if((read(fd,&capacidad,sizeof(int))) == -1) return ERROR_FICHERO_READ;
+    if(crea_sala(capacidad) < 0){fprintf(stderr,"Error al crear la sala.\n");exit(-1);}
+    if(close(fd) == -1)return ERROR_FICHERO_CLOSE;
+    int numero_asientos = argc - optind;
+    int asientos[numero_asientos];
+    int it = 0;
+    for(int i = 0; i < numero_asientos; i++,optind++)
     {
-    	int ids = atoi(argv[optind]);
-    	if(ids>0 && ids < capacidad_sala()){
-    		libera_asiento(ids);
+    	int id_asiento = atoi(argv[optind]);
+    	if(id_asiento > 0 && id_asiento <= capacidad_sala()){
+            asientos[it] = id_asiento; it++;
     	}else{
-    		fprintf(stderr,"el asiento %d no es valido para liberar\n",ids);
+    		fprintf(stderr,"el asiento %d no es valido para liberar\n",id_asiento);
     	}
        
     }
-    guarda_estado_sala(ruta);
+    int asientos_final[it];
+    for(int i = 0; i< it; i++)
+    {
+        asientos_final[i] = asientos[i];
+    }
+    int error = recupera_estadoparcial_sala(ruta, it, asientos_final);
+    if(error < 0){
+        fprintf(stderr, "error al recuperar el estado de la sala\n");
+        exit(-1);
+    }
+    for(int i = 0; i< it; i++)
+    {
+        libera_asiento(asientos_final[i]);
+    }
+    error = guarda_estadoparcial_sala(ruta, it, asientos_final);
+    if(error < 0){
+        fprintf(stderr, "error al guardar el estado de la sala\n");
+        exit(-1);
+    }
     if(elimina_sala() < 0){fprintf(stderr,"Error al eliminar la sala.\n");exit(-1);}
+    return 0;
 }
 int procesar_estado(char* ruta)
 {

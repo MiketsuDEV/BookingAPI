@@ -152,17 +152,22 @@ int guarda_estadoparcial_sala(const char* ruta_fichero, int num_asientos, int* i
 
 }
 int recupera_estadoparcial_sala(const char* ruta_fichero, int num_asientos, int* id_asientos)
-{//WIP
+{
     int fd = open(ruta_fichero, O_RDONLY);
     if(fd == -1){perror("Error al abrir el archivo");exit(-1);}
     int block_size = calcular_blk_size(ruta_fichero);
+    if(block_size == ERROR_MEMORIA) return ERROR_MEMORIA;
+    int capacidad;
+    if((read(fd,&capacidad,sizeof(int))) == -1) return ERROR_FICHERO_READ;
+    if((read(fd,&capacidad,sizeof(int))) == -1) return ERROR_FICHERO_READ;
+    num_asientos_ocupados = capacidad;
     for(int i = 0;i<num_asientos;i++)
     {
         int id = id_asientos[i];
         if(lseek(fd,(id+1)*sizeof(int),SEEK_SET) == -1){perror("Error al mover el puntero del archivo");exit(-1);}
         int id_persona;
         if((read(fd, &id_persona, sizeof(int))) == -1){perror("Error al escribir en el archivo");exit(-1);}
-        ptr_ini_sala[id] = id_persona;
+        ptr_ini_sala[id-1] = id_persona;
     }
 
     if(close(fd) == -1){perror("Error al cerrar el archivo");exit(-1);}
