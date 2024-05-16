@@ -3,11 +3,13 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
 #include "error_manager.h"
 #include "sala.h"
-#include "gestor_ficheros.h"
 #include "misala.h"
-#include "errno.h"
 
 bool fflag, cflag, oflag = false;
 
@@ -41,10 +43,9 @@ int procesar_orden(int argc, char *argv[])
         }
     }
     char* orden = argv[optind]; optind++;
-
     if(oflag){ruta = argv[optind];optind++;}
+    if(fflag = false){fprintf(stderr,"No se ha especificado el argumento -f\n"); exit(-1);}
     
-  
 
     if(!strcmp(orden, "crea"))
     {
@@ -65,49 +66,81 @@ int procesar_orden(int argc, char *argv[])
 
 }
 
-void verifica_ruta(const char *ruta){
-	if(access(ruta, F_OK)==-1){
+int verifica_ruta(const char *ruta, const char *proceso){
+
+   
+
+    if(!strcmp(proceso, "crea")){
+        if(access(ruta, F_OK) == -1) return 0;
+        if(oflag){
+            return 0;
+        }else{
+            fprintf(stderr,"no se puede sobreescribir el archivo,no se ha especificado la opcion -o\n");
+            exit(-1);
+        }
+    }
+    if(access(ruta, F_OK)==-1){
 		fprintf(stderr,"la ruta %s no existe\n",ruta);
 		exit(-1);
 	}
-	if(access(ruta,R_OK)||access(ruta,W_OK)){
+     if(access(ruta,R_OK)||access(ruta,W_OK)){
 		fprintf(stderr,"no se tienen los permisos adecuados\n");
 		exit(-1);
 	}
+	
+	
 }
 
 
 
 int procesar_crea(char* ruta, int capacidad)
 {
+    verifica_ruta(ruta, "crea");
     if(crea_sala(capacidad) < 0){fprintf(stderr,"Error al crear la sala.\n");exit(-1);}
-    guarda_estado_sala(ruta, true, oflag);
+    if(guarda_estado_sala(ruta) < 0){
+        fprintf(stderr,"Error al guardar la sala.\n");exit(-1);
+    }
     if(elimina_sala() < 0){fprintf(stderr,"Error al eliminar la sala.\n");exit(-1);}
+    return 0;
 
 }
 int procesar_reserva(char* ruta, int argc, char *argv[])
 {
-    verifica_ruta(ruta);
+    verifica_ruta(ruta, "estado");
+    int fd = open(ruta, O_RDONLY);
+    if(fd == -1) return ERROR_FICHERO_OPEN;
+    int capacidad;
+    if((read(fd,&capacidad,sizeof(int))) == -1) return ERROR_FICHERO_READ;
+    if(crea_sala(capacidad) < 0){fprintf(stderr,"Error al crear la sala.\n");exit(-1);}
+    if(close(fd) == -1)return ERROR_FICHERO_CLOSE;
     recupera_estado_sala(ruta);
+
     int asientos = asientos_libres();
     int personas = argc - optind;
     if (asientos < personas){
     	fprintf(stderr, "no se pudo realizar la reserva, no hay suficientes asientos \n");
     	exit(-1);
     }
-    
-    for(int i = 0; optind< argc; i++,optind++)
+    int asientos_reservados[personas];
+    int id_persona;
+    for(int i = 0; i < personas; i++,optind++)
     {
-    	
-       reserva_asiento(atoi(argv[optind]));
+        id_persona = atoi(argv[optind]);
+        if(id_persona < 0){fprintf(stderr, "error id_persona no valido \n");}
+        asientos_reservados[i] = reserva_asiento(id_persona);
     }
-    guarda_estado_sala(ruta, false,oflag);
+    int error = guarda_estadoparcial_sala(ruta, personas, asientos_reservados);
+    if(error < 0){
+        fprintf(stderr, "error al guardar el estado de la sala\n");
+        exit(-1);
+    }
     if(elimina_sala() < 0){fprintf(stderr,"Error al eliminar la sala.\n");exit(-1);}
+    return 0;
 }
 
 int procesar_anula(char* ruta, int argc, char *argv[])
 {
-    verifica_ruta(ruta);
+    //verifica_ruta(ruta);
     recupera_estado_sala(ruta);
     for(int i = 0; optind< argc; i++,optind++)
     {
@@ -119,12 +152,19 @@ int procesar_anula(char* ruta, int argc, char *argv[])
     	}
        
     }
-    guarda_estado_sala(ruta, false,oflag);
+    guarda_estado_sala(ruta);
     if(elimina_sala() < 0){fprintf(stderr,"Error al eliminar la sala.\n");exit(-1);}
 }
 int procesar_estado(char* ruta)
 {
-    verifica_ruta(ruta);
+    verifica_ruta(ruta, "estado");
+    int fd = open(ruta, O_RDONLY);
+    if(fd == -1) return ERROR_FICHERO_OPEN;
+    int capacidad;
+    if((read(fd,&capacidad,sizeof(int))) == -1) return ERROR_FICHERO_READ;
+    if(crea_sala(capacidad) < 0){fprintf(stderr,"Error al crear la sala.\n");exit(-1);}
+    if(close(fd) == -1)return ERROR_FICHERO_CLOSE;
+
     recupera_estado_sala(ruta);
     printf("Aforo: %d.\n", capacidad_sala());
 	printf("Asientos ocupados: %d.\n", asientos_ocupados());

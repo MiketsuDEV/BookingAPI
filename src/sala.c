@@ -87,14 +87,14 @@ int elimina_sala()
 
 int guarda_estado_sala(const char* ruta_fichero)
 {
-  int fd = open(ruta_fichero, O_WRONLY | O_CREAT | O_EXCL, 0666);
+  int fd = open(ruta_fichero, O_WRONLY | O_CREAT | O_TRUNC, 0666);
   if(fd == -1) return ERROR_FICHERO_OPEN;
-  if((write(fd, &asientos_libres, sizeof(int))) == -1) return ERROR_FICHERO_WRITE;
-  if((write(fd, &asientos_ocupados, sizeof(int))) == -1) return ERROR_FICHERO_WRITE;
+  if((write(fd, &num_asientos, sizeof(int))) == -1) return ERROR_FICHERO_WRITE;
+  if((write(fd, &num_asientos_ocupados, sizeof(int))) == -1) return ERROR_FICHERO_WRITE;
 
   int block_size = calcular_blk_size(ruta_fichero);
   if(block_size == ERROR_MEMORIA) return ERROR_MEMORIA;
-  int capacidad = asientos_libres;
+  int capacidad = num_asientos;
   ptr = ptr_ini_sala;
 
   while((capacidad - block_size) >= 0)
@@ -109,14 +109,15 @@ int guarda_estado_sala(const char* ruta_fichero)
   return 0;
 }
 int recupera_estado_sala(const char* ruta_fichero)
-{//WIP
+{
   int fd = open(ruta_fichero, O_RDONLY);
   if(fd == -1) return ERROR_FICHERO_OPEN;
 
   int block_size = calcular_blk_size(ruta_fichero);
+  if(block_size == ERROR_MEMORIA) return ERROR_MEMORIA;
   int capacidad;
   if((read(fd,&capacidad,sizeof(int))) == -1) return ERROR_FICHERO_READ;
-  crea_sala(capacidad);
+  num_asientos = capacidad;
   if((read(fd,&capacidad,sizeof(int))) == -1) return ERROR_FICHERO_READ;
   num_asientos_ocupados = capacidad;
   ptr = ptr_ini_sala;
@@ -132,11 +133,11 @@ int recupera_estado_sala(const char* ruta_fichero)
   return 0;
 }
 int guarda_estadoparcial_sala(const char* ruta_fichero, int num_asientos, int* id_asientos)
-{//WIP
-    int fd = open(ruta_fichero, O_RDONLY);
+{
+    int fd = open(ruta_fichero, O_WRONLY);
     if(fd == -1) return ERROR_FICHERO_OPEN;
     int block_size = calcular_blk_size(ruta_fichero);
-
+    if(block_size == ERROR_MEMORIA) return ERROR_MEMORIA;
     for(int i = 0;i<num_asientos;i++)
     {
         int id = id_asientos[i];
@@ -144,6 +145,8 @@ int guarda_estadoparcial_sala(const char* ruta_fichero, int num_asientos, int* i
         id = estado_asiento(id);
         if((write(fd, &id, sizeof(int))) == -1) return ERROR_FICHERO_WRITE;
     }
+    if(lseek(fd,sizeof(int),SEEK_SET) == -1) return ERROR_FICHERO_LSEEK;
+    if((write(fd, &num_asientos_ocupados, sizeof(int))) == -1) return ERROR_FICHERO_WRITE;
     if(close(fd) == -1) return ERROR_FICHERO_CLOSE;
     return 0;
 
