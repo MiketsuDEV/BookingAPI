@@ -140,33 +140,41 @@ int recupera_estado_sala(const char* ruta_fichero)
 
 int guarda_estadoparcial_sala(const char* ruta_fichero, int num_asientos, int* id_asientos)
 {//open
-    int fd = open(ruta_fichero, O_WRONLY);
-    if(fd == -1) return gestor_errores(ERROR_FICHERO_OPEN);
+  int fd = open(ruta_fichero, O_WRONLY);
+  if(fd == -1) return gestor_errores(ERROR_FICHERO_OPEN);
 //read capacidad y asientos ocupados del fichero a guardar
-    int capacidad_fichero;
-    if((read(fd,&capacidad_fichero,sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_READ);
-    int asientos_ocupados_fichero;
-    if((read(fd,&asientos_ocupados_fichero,sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_READ);
+  int capacidad_fichero;
+  if((read(fd,&capacidad_fichero,sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_READ);
+  int asientos_ocupados_fichero;
+  if((read(fd,&asientos_ocupados_fichero,sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_READ);
 //escritura de los asientos validos
-    for(int i = 0;i<num_asientos;i++)
+  for(int i = 0;i<num_asientos;i++)
+  {
+    int id_asiento = id_asientos[i];
+    if(id_asiento <= 0 || id_asiento > num_asientos || id_asiento > capacidad_fichero)
     {
-        int id_asiento = id_asientos[i];
-        if(id_asiento <= 0 || id_asiento > num_asientos || id_asiento > capacidad_fichero)
-        {
-          fprintf(stderr,"El asiento [%d] no es valido, no se ha podido guardar.\n",id_asiento);
+      fprintf(stderr,"El asiento [%d] no es valido, no se ha podido guardar.\n",id_asiento);
 
-        }else
-        {
-          if(lseek(fd,(id_asiento+1)*sizeof(int),SEEK_SET) == -1) return gestor_errores(ERROR_FICHERO_LSEEK);
-          if((read(fd, &id_persona, sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_WRITE);
-          int id_persona = estado_asiento(id_asiento);
-          if(lseek(fd,(id_asiento+1)*sizeof(int),SEEK_SET) == -1) return gestor_errores(ERROR_FICHERO_LSEEK);
-          if((write(fd, &id_persona, sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_WRITE);
-        }
-       
+    }else
+    {
+      if(lseek(fd,(id_asiento+1)*sizeof(int),SEEK_SET) == -1) return gestor_errores(ERROR_FICHERO_LSEEK);
+      int id_persona_fichero;
+      if((read(fd, &id_persona_fichero, sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_WRITE);
+      int id_persona = estado_asiento(id_asiento);
+      //logica asientos ocupados
+      if(id_persona_fichero < 0 && id_persona > 0){
+        asientos_ocupados_fichero++;    
+      }else if(id_persona_fichero > 0 && id_persona < 0){
+        asientos_ocupados_fichero--;
+      }
+      if(lseek(fd,(id_asiento+1)*sizeof(int),SEEK_SET) == -1) return gestor_errores(ERROR_FICHERO_LSEEK);
+      if((write(fd, &id_persona, sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_WRITE);
     }
-    if(lseek(fd,sizeof(int),SEEK_SET) == -1) return ERROR_FICHERO_LSEEK;
-    if((write(fd, &num_asientos_ocupados, sizeof(int))) == -1) return ERROR_FICHERO_WRITE;
+  }
+//actualizamos asientos ocupados
+    if(lseek(fd,sizeof(int),SEEK_SET) == -1) return gestor_errores(ERROR_FICHERO_LSEEK);
+    if((write(fd, &asientos_ocupados_fichero, sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_WRITE);
+//close
     if(close(fd) == -1) return ERROR_FICHERO_CLOSE;
     return 0;
 
