@@ -77,6 +77,7 @@ int crea_sala (int capacidad)
   num_asientos_ocupados = 0;//reset variables
   return num_asientos = capacidad; //devuelve la capacidad de la sala creada 
 }
+
 int elimina_sala()
 {
   if(!sala_creada) return ERROR_SALA_CERRADA;
@@ -86,64 +87,83 @@ int elimina_sala()
 }
 
 int guarda_estado_sala(const char* ruta_fichero)
-{
+{//open
   int fd = open(ruta_fichero, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-  if(fd == -1) return ERROR_FICHERO_OPEN;
-  if((write(fd, &num_asientos, sizeof(int))) == -1) return ERROR_FICHERO_WRITE;
-  if((write(fd, &num_asientos_ocupados, sizeof(int))) == -1) return ERROR_FICHERO_WRITE;
-
+  if(fd == -1) return gestor_errores(ERROR_FICHERO_OPEN);
+//write capacidad y asientos ocupados
+  if((write(fd, &num_asientos, sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_WRITE);
+  if((write(fd, &num_asientos_ocupados, sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_WRITE);
+//calcular tamaño de bloque
   int block_size = calcular_blk_size(ruta_fichero);
-  if(block_size == ERROR_MEMORIA) return ERROR_MEMORIA;
+  if(block_size == ERROR_MEMORIA) return gestor_errores(ERROR_MEMORIA);
+//escritura en bloques
   int capacidad = num_asientos;
   ptr = ptr_ini_sala;
-
   while((capacidad - block_size) >= 0)
   {
-    if((write(fd, ptr, block_size*sizeof(int))) == -1) return ERROR_FICHERO_WRITE;
+    if((write(fd, ptr, block_size*sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_WRITE);
     capacidad-= block_size;
     ptr+= block_size;
   }
-  if((write(fd, ptr, capacidad*sizeof(int))) == -1) return ERROR_FICHERO_WRITE;
-    
-  if(close(fd) == -1)return ERROR_FICHERO_CLOSE;
+  if((write(fd, ptr, capacidad*sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_WRITE);
+  //close
+  if(close(fd) == -1)return gestor_errores(ERROR_FICHERO_CLOSE);
   return 0;
 }
-int recupera_estado_sala(const char* ruta_fichero)
-{
-  int fd = open(ruta_fichero, O_RDONLY);
-  if(fd == -1) return ERROR_FICHERO_OPEN;
 
-  int block_size = calcular_blk_size(ruta_fichero);
-  if(block_size == ERROR_MEMORIA) return ERROR_MEMORIA;
+int recupera_estado_sala(const char* ruta_fichero)
+{//open
+  int fd = open(ruta_fichero, O_RDONLY);
+  if(fd == -1) return gestor_errores(ERROR_FICHERO_OPEN);
+//comprobar sala compatible
   int capacidad;
-  if((read(fd,&capacidad,sizeof(int))) == -1) return ERROR_FICHERO_READ;
-  num_asientos = capacidad;
-  if((read(fd,&capacidad,sizeof(int))) == -1) return ERROR_FICHERO_READ;
-  num_asientos_ocupados = capacidad;
+  if((read(fd,&capacidad,sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_READ);
+  if(capacidad != num_asientos) return gestor_errores(ERROR_SALA_COMPATIBLE);
+//read asientos_ocupados
+  if((read(fd,&num_asientos_ocupados, sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_READ);
+//calcular tamaño de bloque
+  int block_size = calcular_blk_size(ruta_fichero);
+  if(block_size == ERROR_MEMORIA) return gestor_errores(ERROR_MEMORIA);
+//leer por bloques
   ptr = ptr_ini_sala;
-  capacidad = capacidad_sala();
-    while((capacidad - block_size) >= 0)
-    {
-        if((read(fd, ptr, block_size*sizeof(int))) == -1) return ERROR_FICHERO_READ;
-        capacidad-= block_size;
-        ptr+= block_size;
-    }
-  if((read(fd, ptr, capacidad*sizeof(int))) == -1) return ERROR_FICHERO_READ;
-  if(close(fd) == -1){perror("Error al cerrar el archivo");exit(-1);}
+  while((capacidad - block_size) >= 0)
+  {
+    if((read(fd, ptr, block_size*sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_READ);
+    capacidad-= block_size;
+    ptr+= block_size;
+  }
+  if((read(fd, ptr, capacidad*sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_READ);
+//close
+  if(close(fd) == -1) return gestor_errores(ERROR_FICHERO_CLOSE);
   return 0;
 }
+
 int guarda_estadoparcial_sala(const char* ruta_fichero, int num_asientos, int* id_asientos)
-{
+{//open
     int fd = open(ruta_fichero, O_WRONLY);
-    if(fd == -1) return ERROR_FICHERO_OPEN;
-    int block_size = calcular_blk_size(ruta_fichero);
-    if(block_size == ERROR_MEMORIA) return ERROR_MEMORIA;
+    if(fd == -1) return gestor_errores(ERROR_FICHERO_OPEN);
+//read capacidad y asientos ocupados del fichero a guardar
+    int capacidad_fichero;
+    if((read(fd,&capacidad_fichero,sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_READ);
+    int asientos_ocupados_fichero;
+    if((read(fd,&asientos_ocupados_fichero,sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_READ);
+//escritura de los asientos validos
     for(int i = 0;i<num_asientos;i++)
     {
-        int id = id_asientos[i];
-        if(lseek(fd,(id+1)*sizeof(int),SEEK_SET) == -1) return ERROR_FICHERO_LSEEK;
-        id = estado_asiento(id);
-        if((write(fd, &id, sizeof(int))) == -1) return ERROR_FICHERO_WRITE;
+        int id_asiento = id_asientos[i];
+        if(id_asiento <= 0 || id_asiento > num_asientos || id_asiento > capacidad_fichero)
+        {
+          fprintf(stderr,"El asiento [%d] no es valido, no se ha podido guardar.\n",id_asiento);
+
+        }else
+        {
+          if(lseek(fd,(id_asiento+1)*sizeof(int),SEEK_SET) == -1) return gestor_errores(ERROR_FICHERO_LSEEK);
+          if((read(fd, &id_persona, sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_WRITE);
+          int id_persona = estado_asiento(id_asiento);
+          if(lseek(fd,(id_asiento+1)*sizeof(int),SEEK_SET) == -1) return gestor_errores(ERROR_FICHERO_LSEEK);
+          if((write(fd, &id_persona, sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_WRITE);
+        }
+       
     }
     if(lseek(fd,sizeof(int),SEEK_SET) == -1) return ERROR_FICHERO_LSEEK;
     if((write(fd, &num_asientos_ocupados, sizeof(int))) == -1) return ERROR_FICHERO_WRITE;
@@ -183,4 +203,43 @@ int calcular_blk_size(const char* ruta_fichero)
     int block_size = (buf->st_blksize) / sizeof(int);
     free(buf);
     return block_size;
+}
+int gestor_errores(int error)
+{
+  switch (error)
+  {
+  case ERROR_FICHERO_OPEN:
+    perror("Error al abrir el archivo.\n");
+    return error;   
+    break;
+  case ERROR_FICHERO_CLOSE:
+    perror("Error al cerrar el archivo.\n");
+    return error;   
+    break;
+  case ERROR_FICHERO_WRITE:
+    perror("Error al escribir en el archivo.\n");
+    return error;   
+    break;
+  case ERROR_FICHERO_READ:
+    perror("Error al leer el archivo.\n");
+    return error;   
+    break;
+  case ERROR_FICHERO_LSEEK:
+    perror("Error al modificar el puntero del archivo.\n");
+    return error;   
+    break;
+  case ERROR_SALA_COMPATIBLE:
+    perror("Error de compatibilidad entre la sala en memoria y la sala del archivo.\n");
+    return error;   
+    break;
+  case ERROR_MEMORIA:
+    perror("Error al reservar memoria.\n");
+    return error;   
+    break;
+  default:
+    perror("Error no especificado.\n");
+    return error;
+    break;
+  }
+  return 0;
 }
