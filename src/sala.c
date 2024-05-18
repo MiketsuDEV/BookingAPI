@@ -189,6 +189,8 @@ int recupera_estadoparcial_sala(const char* ruta_fichero, int numero_asientos, i
 //read capacidad del fichero a recuperar
   int capacidad_fichero;
   if((read(fd,&capacidad_fichero,sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_READ);
+//comprobamos compatibilidad
+  if(capacidad_fichero != num_asientos) return gestor_errores(ERROR_SALA_COMPATIBLE);
 //lectura de los asientos validos
   for(int i = 0;i<numero_asientos;i++)
   {
