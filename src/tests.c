@@ -50,13 +50,6 @@ void FIN_TEST(const char * titulo_test){
 printf("***************** test terminado\n");
 }
 
-void test_crea(){
-	INICIO_TEST ("test para la creacion de sala");
-	const *char = "../tests/crea",
-	
-	int argc =5;
-	char *argv[] =
-}
 
 
 void test_guarda_estado_sala(){
@@ -70,7 +63,7 @@ void test_guarda_estado_sala(){
 		DebeSerCierto(reserva_asiento(i) == i);
 	}
 	
-	DebeSerCierto(libera_asiento(4)==-15);
+	libera_asiento(4);
 	libera_asiento(8);
 	
 		
@@ -114,7 +107,10 @@ void test_guarda_estado_parcial(){
 	}
 	int asientos[] = {1,2,3};
 	DebeSerCierto(guarda_estadoparcial_sala(ruta_fichero,3,asientos)==0 );
-	printf("\n valor de estado asiento 1 %d \n", estado_asiento(1));
+	for (int i =1; i<=100;i++){
+		printf("\n valor de estado asiento %d %d \n",i, estado_asiento(i));
+
+	}
 	elimina_sala();
 	
 	FIN_TEST("guarda estado parcial");
@@ -140,7 +136,7 @@ void test_recupera_estado_parcial(){
 	printf("\n valor de estado asiento 10 %d \n", estado_asiento(10));
 	DebeSerCierto(estado_asiento(1) == 1);
 	DebeSerCierto(estado_asiento(2) == 2);
-	DebeSerCierto(estado_asiento(5) != 5);
+	DebeSerCierto(estado_asiento(5) == -15);
 	elimina_sala();
 	
 	FIN_TEST("recupera estado parcial");

@@ -212,7 +212,7 @@ int recupera_estadoparcial_sala(const char* ruta_fichero, int numero_asientos, i
       {
         num_asientos_ocupados++;
       }
-      ptr_fin_sala[id_asiento-1] = id_persona_fichero;
+      ptr_ini_sala[id_asiento-1] = id_persona_fichero;
     }
   }
 //close
