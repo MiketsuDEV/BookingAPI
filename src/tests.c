@@ -8,33 +8,9 @@
 #define DebeSerCierto(x) assert(x)
 #define DebeSerFalso(x) assert(!(x))
 
-#define CAPACIDAD_CUYAS 847
-#define CAPACIDAD_ALFREDO_KRAUS 1200
-#define PEREZ_GALDOS 522
-#define PARANINFO 10
 
 
 
-
-#define ID_1  120
-#define ID_2 -2
-#define ID_3 -1
-#define ID_4 1500
-#define ID_5 2
-#define ID_6 1
-
-
-int* estado_sala(){
-	int *estado = (int*) malloc(capacidad_sala() * sizeof(int));
-	if (estado == NULL){
-		fprintf(stderr, "Ocurrio un error al intentar ocupar espacio en memoria");
-		return NULL;
-	}
-	for(int i =1; i <capacidad_sala();i++){
-		estado[i] =estado_asiento(i);
-	}
-	return estado;
-}
 
 
 
@@ -147,5 +123,6 @@ int main(){
 	test_recupera_estado();
 	test_guarda_estado_parcial();
 	test_recupera_estado_parcial();
+	printf("TODOS LOS TESTS PASADOS");
 }
 
