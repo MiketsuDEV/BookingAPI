@@ -32,6 +32,7 @@ int reserva_asiento(int id_persona)
       return ptr - ptr_ini_sala + 1;
     } 
   }
+  return ERROR_SALA_LLENA;
 }
 
 int libera_asiento (int id_asiento)

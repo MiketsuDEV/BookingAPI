@@ -9,6 +9,7 @@
         "unistd.h": "c",
         "types.h": "c",
         "stdio.h": "c",
-        "stat.h": "c"
+        "stat.h": "c",
+        "stdlib.h": "c"
     }
 }
