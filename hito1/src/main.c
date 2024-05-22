@@ -16,7 +16,7 @@ void main(int argc, char *argv[])
     int numero_hilos = atoi(argv[1]);
     if(numero_hilos == 0){fprintf(stderr,"Error en el argumento pasado por consola.\n");exit(-1);}
 
-    crea_sala(CAPACIDAD_SALA);
+    if(crea_sala(CAPACIDAD_SALA) <= -1){fprintf(stderr,"Error al crear la sala.\n");exit(-1);}
     pthread_t hilos[numero_hilos];
     srand(time(NULL));
     for(int i = 0; i < numero_hilos; i++)
@@ -31,6 +31,7 @@ void main(int argc, char *argv[])
         pthread_join (hilos[i], NULL);
     }
     estado_sala();
+    if(elimina_sala() <= -1){{fprintf(stderr,"Error al eliminar la sala.\n");exit(-1);}}
     exit(0);
 }
 void* reserva_libera_hilos(void* arg)
