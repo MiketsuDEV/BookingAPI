@@ -11,6 +11,8 @@
 
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+extern pthread_cond_t condicion_reserva;
+extern pthread_cond_t condicion_libera;
 
 int const CAPACIDAD_MAXIMA = 20000; //constante límite de asientos que pude tener una sala al crearse
 int* ptr_ini_sala; //puntero fijo al inicio del vector de asientos
@@ -31,6 +33,7 @@ int reserva_asiento(int id_persona)
     {//recorremos los asientos hasta encontrar uno vacio y lo reservamos
       *ptr = id_persona;
       num_asientos_ocupados++;
+      pthread_cond_signal(&condicion_libera);
       pthread_mutex_unlock(&mutex);
       return ptr - ptr_ini_sala + 1;
     } 
@@ -48,6 +51,7 @@ int libera_asiento (int id_asiento)
   if(id_persona == -1)return ERROR_ASIENTO_VACIO;
   num_asientos_ocupados--;
   *ptr = -1;
+  pthread_cond_signal(&condicion_reserva);
   pthread_mutex_unlock(&mutex);
   return id_persona; 
 }
