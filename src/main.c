@@ -12,56 +12,70 @@
 #define PERSONA 2
 void main(int argc, char *argv[])
 {
-    if(argc != 2){fprintf(stderr,"Error en el numero de argumentos.\n");exit(-1);}
-    int numero_hilos = atoi(argv[1]);
-    if(numero_hilos == 0){fprintf(stderr,"Error en el argumento pasado por consola.\n");exit(-1);}
+    if(argc != 3){fprintf(stderr,"Error en el numero de argumentos.\n");exit(-1);}
+    int numero_hilos_reserva = atoi(argv[1]);
+    if(numero_hilos_reserva == 0){fprintf(stderr,"Error en el argumento pasado por consola.\n");exit(-1);}
+    int numero_hilos_libera = atoi(argv[2]);
+    if(numero_hilos_libera == 0){fprintf(stderr,"Error en el argumento pasado por consola.\n");exit(-1);}
 
     if(crea_sala(CAPACIDAD_SALA) <= -1){fprintf(stderr,"Error al crear la sala.\n");exit(-1);}
-    pthread_t hilos[numero_hilos];
     srand(time(NULL));
-    for(int i = 0; i < numero_hilos; i++)
+
+    pthread_t hilos_reserva[numero_hilos_reserva];
+    pthread_t hilos_libera[numero_hilos_libera];
+    for(int i = 0; i < numero_hilos_reserva; i++)
     {
-        pthread_create(&hilos[i],NULL,reserva_libera_hilos,(void*)i);
+        pthread_create(&hilos_reserva[i],NULL,reserva_hilo,(void*)i);
     }
+    for(int i = 0; i < numero_hilos_libera; i++)
+    {
+        pthread_create(&hilos_libera[i],NULL,libera_hilo,(void*)i);
+    }
+
     pthread_t hilo_estado;
     pthread_create(&hilo_estado,NULL,estado_sala_hilo,NULL);
     pthread_join (hilo_estado, NULL);
-    for(int i = 0; i < numero_hilos; i++)
+    for(int i = 0; i < numero_hilos_reserva; i++)
     {
-        pthread_join (hilos[i], NULL);
+        pthread_join(hilos_reserva[i], NULL);
     }
+    for(int i = 0; i < numero_hilos_libera; i++)
+    {
+        pthread_join(hilos_libera[i], NULL);
+    }
+
     estado_sala();
     if(elimina_sala() <= -1){{fprintf(stderr,"Error al eliminar la sala.\n");exit(-1);}}
     exit(0);
 }
-void* reserva_libera_hilos(void* arg)
+void* reserva_hilo(void* arg)
 {
-    int valor_reserva[3];
-    //reserva
     for(int i = 0; i < 3; i++)
     {
-        valor_reserva[i] = reserva_asiento(id_aleatorio(PERSONA));
-        if(valor_reserva[i] == ERROR_SALA_LLENA)
+        int valor_reserva = reserva_asiento(id_aleatorio(PERSONA));
+        if(valor_reserva == ERROR_SALA_LLENA)
         {
-            printf("!!HILO %d ABORTADO !! ERROR RESERVA!!\n", (int)arg);
-            pthread_exit(NULL);
+            //variable condicion
         }else
         {
-            printf("HILO %d: se ha reservado el asiento %d.\n", (int)arg, valor_reserva[i]);
+            printf("HILO-RESERVA [%d]: se ha reservado el asiento %d.\n", (int)arg, valor_reserva);
         }
         pausa_aleatoria(2);
     }
-    //libera
+    
+}
+void* libera_hilo(void* arg)
+{
+    
     for(int i = 0; i < 3; i++)
     {
-        int valor_libera = libera_asiento(valor_reserva[i]);
+        int valor_libera = libera_asiento(NULL);
         if(valor_libera == ERROR_ASIENTO_VACIO)
         {
-            printf("!!HILO %d ABORTADO !! ERROR LIBERA!!\n", (int)arg);
-            pthread_exit(NULL);
+           
         }else
         {
-            printf("HILO %d: se ha liberado el asiento %d.\n", (int)arg, valor_reserva[i]);
+            
         }
         pausa_aleatoria(2);
     }

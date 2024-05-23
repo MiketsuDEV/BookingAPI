@@ -7,7 +7,7 @@
 #include <errno.h>
 #include "sala.h"
 #include "error_manager.h"
-
+#include "retardo.c"
 
 
 int const CAPACIDAD_MAXIMA = 20000; //constante límite de asientos que pude tener una sala al crearse
@@ -20,6 +20,7 @@ bool sala_creada;//booleano para ver el estado de la sala 0 = No hay sala creada
 
 int reserva_asiento(int id_persona)
 {
+  pausa_aleatoria(2);
   if(!sala_creada){return ERROR_SALA_CERRADA;}
   if(id_persona <= 0){return ERROR_ID_PERSONA;}
   if(num_asientos == num_asientos_ocupados){return ERROR_SALA_LLENA;}
@@ -37,6 +38,7 @@ int reserva_asiento(int id_persona)
 
 int libera_asiento (int id_asiento)
 {
+  pausa_aleatoria(2);
   if(!sala_creada) return ERROR_SALA_CERRADA;
   if (id_asiento > num_asientos || id_asiento <= 0)return ERROR_ID_ASIENTO;
   ptr = ptr_ini_sala + id_asiento - 1;
