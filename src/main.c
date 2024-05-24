@@ -28,17 +28,18 @@ void main(int argc, char *argv[])
     if(crea_sala(CAPACIDAD_SALA) <= -1){fprintf(stderr,"Error al crear la sala.\n");exit(-1);}
     srand(time(NULL));
 
-    pthread_cond_init(&condicion_reserva,NULL);
-    pthread_cond_init(&condicion_libera,NULL);
-    pthread_mutex_init (&cerrojo_reserva, NULL);
-    pthread_mutex_init (&cerrojo_libera, NULL);
+    pthread_cond_init(&condicion_reserva, NULL);
+    pthread_cond_init(&condicion_libera, NULL);
+    pthread_mutex_init(&cerrojo_reserva, NULL);
+    pthread_mutex_init(&cerrojo_libera, NULL);
     pthread_t hilos_reserva[numero_hilos_reserva];
     pthread_t hilos_libera[numero_hilos_libera];
-    for(int i = 1; i <= numero_hilos_reserva; i++)
+
+    for(int i = 0; i <= numero_hilos_reserva; i++)
     {
         pthread_create(&hilos_reserva[i],NULL,reserva_hilo,(void*)i);
     }
-    for(int i = 1; i <= numero_hilos_libera; i++)
+    for(int i = 0; i <= numero_hilos_libera; i++)
     {
         pthread_create(&hilos_libera[i],NULL,libera_hilo,(void*)i);
     }
@@ -73,7 +74,7 @@ void* reserva_hilo(void* arg)
             pthread_cond_wait(&condicion_reserva, &cerrojo_reserva);
         }
         int valor_reserva = reserva_asiento(id_aleatorio(PERSONA));
-        printf("HILO-RESERVA [%d]: se ha reservado el asiento %d.\n", (int)arg, valor_reserva);
+        printf("HILO-RESERVA [%d]: se ha reservado el asiento %d.\n", ((int)arg)+1, valor_reserva);
         pthread_mutex_unlock(&cerrojo_reserva);
         pausa_aleatoria(2);//duda donde poner la pausa con respecto a cerrojo
     }
@@ -94,7 +95,7 @@ void* libera_hilo(void* arg)
             if(estado_asiento(j) != ERROR_ASIENTO_VACIO)
             {
                 libera_asiento(j);
-                printf("HILO-LIBERA [%d]: se ha liberado el asiento %d.\n", (int)arg, j);
+                printf("HILO-LIBERA [%d]: se ha liberado el asiento %d.\n", ((int)arg)+1, j);
                 break;
             }
         }

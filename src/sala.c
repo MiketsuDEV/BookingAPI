@@ -10,7 +10,7 @@
 #include "error_manager.h"
 
 
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t cerrojo = PTHREAD_MUTEX_INITIALIZER;
 extern pthread_cond_t condicion_reserva;
 extern pthread_cond_t condicion_libera;
 
@@ -25,7 +25,7 @@ int reserva_asiento(int id_persona)
 {
   if(!sala_creada){return ERROR_SALA_CERRADA;}
   if(id_persona <= 0){return ERROR_ID_PERSONA;}
-  pthread_mutex_lock(&mutex);
+  pthread_mutex_lock(&cerrojo);
   if(num_asientos == num_asientos_ocupados){return ERROR_SALA_LLENA;}
   for(int* ptr=ptr_ini_sala;ptr<=ptr_fin_sala;ptr++)
   { 
@@ -34,7 +34,7 @@ int reserva_asiento(int id_persona)
       *ptr = id_persona;
       num_asientos_ocupados++;
       pthread_cond_signal(&condicion_libera);
-      pthread_mutex_unlock(&mutex);
+      pthread_mutex_unlock(&cerrojo);
       return ptr - ptr_ini_sala + 1;
     } 
   }
@@ -46,13 +46,13 @@ int libera_asiento (int id_asiento)
   if(!sala_creada) return ERROR_SALA_CERRADA;
   if (id_asiento > num_asientos || id_asiento <= 0)return ERROR_ID_ASIENTO;
   int* ptr = ptr_ini_sala + id_asiento - 1;
-  pthread_mutex_lock(&mutex);
+  pthread_mutex_lock(&cerrojo);
   int id_persona = *ptr;
   if(id_persona == -1)return ERROR_ASIENTO_VACIO;
   num_asientos_ocupados--;
   *ptr = -1;
   pthread_cond_signal(&condicion_reserva);
-  pthread_mutex_unlock(&mutex);
+  pthread_mutex_unlock(&cerrojo);
   return id_persona; 
 }
 
