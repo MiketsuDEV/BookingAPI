@@ -45,7 +45,7 @@ int libera_asiento (int id_asiento)
   int* ptr = ptr_ini_sala + id_asiento - 1;
   pthread_mutex_lock(&mutex);
   int id_persona = *ptr;
-  if(id_persona == -1)return ERROR_ASIENTO_VACIO;
+  if(id_persona == -1)return ERROR_ASIENTO_VACIO;//return sin mutex
   num_asientos_ocupados--;
   *ptr = -1;
   pthread_mutex_unlock(&mutex);
@@ -59,7 +59,7 @@ int estado_asiento (int id_asiento)
   return *(ptr_ini_sala + id_asiento - 1) == -1 ? ERROR_ASIENTO_VACIO : *(ptr_ini_sala + id_asiento - 1);
 }
 
-int asientos_libres (){if(!sala_creada) return ERROR_SALA_CERRADA; return num_asientos - num_asientos_ocupados;}
+int asientos_libres (){if(!sala_creada) return ERROR_SALA_CERRADA; return num_asientos - num_asientos_ocupados;}//seccion critica usar mutex
 
 int asientos_ocupados(){if(!sala_creada) return ERROR_SALA_CERRADA; return num_asientos_ocupados;}
 

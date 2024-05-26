@@ -11,6 +11,8 @@
 
 
 pthread_mutex_t cerrojo = PTHREAD_MUTEX_INITIALIZER;
+extern pthread_cond_t condicion_reserva;
+extern pthread_cond_t condicion_libera;
 
 int const CAPACIDAD_MAXIMA = 20000; //constante límite de asientos que pude tener una sala al crearse
 int* ptr_ini_sala; //puntero fijo al inicio del vector de asientos
@@ -21,81 +23,59 @@ bool sala_creada;//booleano para ver el estado de la sala 0 = No hay sala creada
 
 int reserva_asiento(int id_persona)
 {
+  if(!sala_creada){return ERROR_SALA_CERRADA;}
+  if(id_persona <= 0){return ERROR_ID_PERSONA;}
   pthread_mutex_lock(&cerrojo);
-  if(id_persona <= 0)return gestor_errores(ERROR_ID_PERSONA);
-  if(!sala_creada)return gestor_errores(ERROR_SALA_CERRADA);
-  if(num_asientos == num_asientos_ocupados) return gestor_errores(ERROR_SALA_LLENA);
+  if(num_asientos == num_asientos_ocupados){return ERROR_SALA_LLENA;}
   for(int* ptr=ptr_ini_sala;ptr<=ptr_fin_sala;ptr++)
   { 
     if(*ptr == -1)
     {//recorremos los asientos hasta encontrar uno vacio y lo reservamos
       *ptr = id_persona;
       num_asientos_ocupados++;
+      pthread_cond_signal(&condicion_libera);
       pthread_mutex_unlock(&cerrojo);
       return ptr - ptr_ini_sala + 1;
     } 
   }
+  return ERROR_SALA_LLENA;
 }
 
 int libera_asiento (int id_asiento)
 {
-  pthread_mutex_lock(&cerrojo);
-  if(!sala_creada) return gestor_errores(ERROR_SALA_CERRADA);
-  if (id_asiento > num_asientos || id_asiento <= 0)return gestor_errores(ERROR_ID_ASIENTO);
+  if(!sala_creada) return ERROR_SALA_CERRADA;
+  if (id_asiento > num_asientos || id_asiento <= 0)return ERROR_ID_ASIENTO;
   int* ptr = ptr_ini_sala + id_asiento - 1;
+  pthread_mutex_lock(&cerrojo);
   int id_persona = *ptr;
-  if(id_persona == -1)return gestor_errores(ERROR_ASIENTO_VACIO);
+  if(id_persona == -1)return ERROR_ASIENTO_VACIO;
   num_asientos_ocupados--;
   *ptr = -1;
+  pthread_cond_signal(&condicion_reserva);
   pthread_mutex_unlock(&cerrojo);
   return id_persona; 
 }
 
 int estado_asiento (int id_asiento)
 {
-  pthread_mutex_lock(&cerrojo);
-  if(!sala_creada) return gestor_errores(ERROR_SALA_CERRADA);
-  if (id_asiento > num_asientos || id_asiento <= 0)return gestor_errores(ERROR_ID_ASIENTO);
-  int estado = *(ptr_ini_sala + id_asiento - 1);
-  pthread_mutex_unlock(&cerrojo);
-  return  estado == -1 ? gestor_errores(ERROR_ASIENTO_VACIO) : estado;
+  if(!sala_creada) return ERROR_SALA_CERRADA;
+  if (id_asiento > num_asientos || id_asiento <= 0)return ERROR_ID_ASIENTO;
+  return *(ptr_ini_sala + id_asiento - 1) == -1 ? ERROR_ASIENTO_VACIO : *(ptr_ini_sala + id_asiento - 1);
 }
 
-int asientos_libres ()
-{
-  pthread_mutex_lock(&cerrojo);
-  if(!sala_creada) return gestor_errores(ERROR_SALA_CERRADA);
-  int asientos = num_asientos - num_asientos_ocupados;
-  pthread_mutex_unlock(&cerrojo);
-  return asientos;
-}
+int asientos_libres (){if(!sala_creada) return ERROR_SALA_CERRADA; return num_asientos - num_asientos_ocupados;}
 
-int asientos_ocupados()
-{
-  pthread_mutex_lock(&cerrojo);
-  if(!sala_creada) return gestor_errores(ERROR_SALA_CERRADA);
-  int asientos = num_asientos_ocupados;
-  pthread_mutex_unlock(&cerrojo);
-  return asientos;
-}
+int asientos_ocupados(){if(!sala_creada) return ERROR_SALA_CERRADA; return num_asientos_ocupados;}
 
-int capacidad_sala()
-{
-  pthread_mutex_lock(&cerrojo);
-  if(!sala_creada) return gestor_errores(ERROR_SALA_CERRADA);
-  int asientos = num_asientos;
-  pthread_mutex_unlock(&cerrojo);
-  return asientos;
-}
+int capacidad_sala(){if(!sala_creada) return ERROR_SALA_CERRADA; return num_asientos;}
 
 int crea_sala (int capacidad)
 {
-  pthread_mutex_lock(&cerrojo);
-  if(sala_creada) return gestor_errores(ERROR_SALA_ABIERTA);
-  if(capacidad>CAPACIDAD_MAXIMA || capacidad <= 0)return gestor_errores(ERROR_SALA_CAPACIDAD);
+  if(sala_creada) return ERROR_SALA_ABIERTA;
+  if(capacidad>CAPACIDAD_MAXIMA || capacidad <= 0)return ERROR_SALA_CAPACIDAD;
 
   ptr_ini_sala = (int*)malloc(capacidad * sizeof(int));//reservamos memoria
-  if(ptr_ini_sala == NULL) return gestor_errores(ERROR_MEMORIA);//comprobamos que se ha reservado memoria adecuadamente
+  if(ptr_ini_sala == NULL) return ERROR_MEMORIA;//comprobamos que se ha reservado memoria adecuadamente
   ptr_fin_sala = ptr_ini_sala + capacidad - 1;//seteamos puntero fijo al ultimo asiento del vector
 
   for (int* ptr=ptr_ini_sala;ptr<=ptr_fin_sala;ptr++)
@@ -105,25 +85,19 @@ int crea_sala (int capacidad)
   
   sala_creada = true; 
   num_asientos_ocupados = 0;//reset variables
-  num_asientos = capacidad;
-  pthread_mutex_unlock(&cerrojo);
-  return capacidad; //devuelve la capacidad de la sala creada 
+  return num_asientos = capacidad; //devuelve la capacidad de la sala creada 
 }
 
 int elimina_sala()
 {
-  pthread_mutex_lock(&cerrojo);
-  if(!sala_creada) return gestor_errores(ERROR_SALA_CERRADA);
+  if(!sala_creada) return ERROR_SALA_CERRADA;
   free(ptr_ini_sala);//liberamos memoria
   num_asientos = 0; num_asientos_ocupados = 0; //reset variables
-  sala_creada = false;
-  pthread_mutex_unlock(&cerrojo);
-  return false; //retorna 0 si se elimina la sala correctamente
+  return sala_creada = false; //retorna 0 si se elimina la sala correctamente
 }
 
 int guarda_estado_sala(const char* ruta_fichero)
 {//open
-  pthread_mutex_lock(&cerrojo);
   int fd = open(ruta_fichero, O_WRONLY | O_CREAT | O_TRUNC, 0666);
   if(fd == -1) return gestor_errores(ERROR_FICHERO_OPEN);
 //write capacidad y asientos ocupados
@@ -144,13 +118,11 @@ int guarda_estado_sala(const char* ruta_fichero)
   if((write(fd, ptr, capacidad*sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_WRITE);
   //close
   if(close(fd) == -1)return gestor_errores(ERROR_FICHERO_CLOSE);
-  pthread_mutex_unlock(&cerrojo);
   return 0;
 }
 
 int recupera_estado_sala(const char* ruta_fichero)
 {//open
-  pthread_mutex_lock(&cerrojo);
   int fd = open(ruta_fichero, O_RDONLY);
   if(fd == -1) return gestor_errores(ERROR_FICHERO_OPEN);
 //comprobar sala compatible
@@ -173,13 +145,11 @@ int recupera_estado_sala(const char* ruta_fichero)
   if((read(fd, ptr, capacidad*sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_READ);
 //close
   if(close(fd) == -1) return gestor_errores(ERROR_FICHERO_CLOSE);
-  pthread_mutex_unlock(&cerrojo);
   return 0;
 }
 
 int guarda_estadoparcial_sala(const char* ruta_fichero, int numero_asientos, int* id_asientos)
 {//open
-  pthread_mutex_lock(&cerrojo);
   int fd = open(ruta_fichero, O_RDWR);
   if(fd == -1) return gestor_errores(ERROR_FICHERO_OPEN);
 //read capacidad y asientos ocupados del fichero a guardar
@@ -218,14 +188,12 @@ int guarda_estadoparcial_sala(const char* ruta_fichero, int numero_asientos, int
   if((write(fd, &asientos_ocupados_fichero, sizeof(int))) == -1) return gestor_errores(ERROR_FICHERO_WRITE);
 //close
   if(close(fd) == -1) return gestor_errores(ERROR_FICHERO_CLOSE);
-  pthread_mutex_unlock(&cerrojo);
   return 0;
 
 }
 
 int recupera_estadoparcial_sala(const char* ruta_fichero, int numero_asientos, int* id_asientos)
 {//open
-  pthread_mutex_lock(&cerrojo);
   int fd = open(ruta_fichero, O_RDWR);
   if(fd == -1) return gestor_errores(ERROR_FICHERO_OPEN);   
 //read capacidad del fichero a recuperar
@@ -258,9 +226,8 @@ int recupera_estadoparcial_sala(const char* ruta_fichero, int numero_asientos, i
     }
   }
 //close
-  if(close(fd) == -1) return gestor_errores(ERROR_FICHERO_CLOSE);
-  pthread_mutex_unlock(&cerrojo);
-  return 0;
+    if(close(fd) == -1) return gestor_errores(ERROR_FICHERO_CLOSE);
+    return 0;
 }
 
 int calcular_blk_size(const char* ruta_fichero)
@@ -278,48 +245,37 @@ int gestor_errores(int error)
   switch (error)
   {
   case ERROR_FICHERO_OPEN:
-    perror("Error al abrir el archivo.\n"); 
+    perror("Error al abrir el archivo.\n");
+    return error;   
     break;
   case ERROR_FICHERO_CLOSE:
     perror("Error al cerrar el archivo.\n");
+    return error;   
     break;
   case ERROR_FICHERO_WRITE:
-    perror("Error al escribir en el archivo.\n"); 
+    perror("Error al escribir en el archivo.\n");
+    return error;   
     break;
   case ERROR_FICHERO_READ:
-    perror("Error al leer el archivo.\n");  
+    perror("Error al leer el archivo.\n");
+    return error;   
     break;
   case ERROR_FICHERO_LSEEK:
-    perror("Error al modificar el puntero del archivo.\n");  
+    perror("Error al modificar el puntero del archivo.\n");
+    return error;   
     break;
   case ERROR_SALA_COMPATIBLE:
-    perror("Error de compatibilidad entre la sala en memoria y la sala del archivo.\n");  
+    perror("Error de compatibilidad entre la sala en memoria y la sala del archivo.\n");
+    return error;   
     break;
   case ERROR_MEMORIA:
-    perror("Error al reservar memoria.\n"); 
-    break;
-  case ERROR_ID_PERSONA:
-    perror("Error, el ID-PERSONA no es valido.\n"); 
-    break;
-  case ERROR_SALA_CERRADA:
-    perror("Error no hay una sala abierta.\n"); 
-    break;
-  case ERROR_SALA_LLENA:
-    perror("Error, la sala esta llena.\n"); 
-    break;
-  case ERROR_ID_ASIENTO:
-    perror("Error, el ID-ASIENTO no es valido.\n"); 
-    break;
-  case ERROR_ASIENTO_VACIO:
-    perror("Error, el asiento esta vacio.\n"); 
-    break;
-  case ERROR_SALA_ABIERTA:
-    perror("Error, la sala ya esta abierta.\n"); 
+    perror("Error al reservar memoria.\n");
+    return error;   
     break;
   default:
     perror("Error no especificado.\n");
+    return error;
     break;
   }
-  pthread_mutex_unlock(&cerrojo);
-  return error;
+  return 0;
 }

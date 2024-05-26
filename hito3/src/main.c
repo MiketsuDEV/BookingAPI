@@ -74,10 +74,9 @@ void* reserva_hilo(void* arg)
             pthread_cond_wait(&condicion_reserva, &cerrojo_reserva);
         }
         int valor_reserva = reserva_asiento(id_aleatorio(PERSONA));
-        pthread_cond_signal(&condicion_libera);
         printf("HILO-RESERVA [%d]: se ha reservado el asiento %d.\n", ((int)arg)+1, valor_reserva);
         pthread_mutex_unlock(&cerrojo_reserva);
-        pausa_aleatoria(2);
+        pausa_aleatoria(2);//duda donde poner la pausa con respecto a cerrojo
     }
     
 }
@@ -97,7 +96,6 @@ void* libera_hilo(void* arg)
             {
                 libera_asiento(j);
                 printf("HILO-LIBERA [%d]: se ha liberado el asiento %d.\n", ((int)arg)+1, j);
-                pthread_cond_signal(&condicion_reserva);
                 break;
             }
         }
